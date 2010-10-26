@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<playlist version="1" xmlns="http://xspf.org/ns/0/" xmlns:imob="http://imobilco.ru/playlist">
+	<title>Маруся</title>
+	<info>http://etnogenes.imobilco.ru/marusya/</info>
+	
+	<trackList>
+		<track>
+			<location>file:///mp3s/song_1.mp3</location>
+			<trackNum>1</trackNum>
+			<duration>123123</duration> <!-- milliseconds -->
+			<album>Этногенез</album>
+			<extension application="http://imobilco.ru/playlist">
+				<imob:ogg>file:///mp3s/song_1.ogg</imob:ogg>
+			</extension>
+		</track>
+		<track>
+			<location>file:///mp3s/song_2.mp3</location>
+		</track>
+		<track>
+			<location>file:///mp3s/song_3.mp3</location>
+		</track>
+	</trackList>
+</playlist>
