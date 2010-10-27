@@ -19,8 +19,9 @@
  * @param {String|Document} data Content of the playlist.
  */
 var XSPF = (function(){
-	var playlist_fields = ['title', 'creator', 'annotation', 'info', 'location', 'identifier', 'image', 'date'],
-		track_fields = ['location', 'identifier', 'title', 'creator', 'annotation', 'info', 'image', 'album', 'trackNum', 'duration'];
+	var playlist_fields = ['title', 'creator', 'annotation', 'info', 'identifier', 'image', 'date', 'location'],
+		track_fields = ['title', 'creator', 'annotation', 'info', 'image', 'album', 'trackNum', 'duration'],
+		track_multi_fields = ['location', 'identifier'];
 		
 	function toXML(text) {
 		var xmldoc = null;
@@ -87,34 +88,106 @@ var XSPF = (function(){
 	 */
 	function parseDate(date_str) {
 		var m, result = new Date,
-			re_date = /^(\d{4})\-(\d{2})\-(\d{2})T(\d{2}):(\d{2}):(\d{2})(\.\d+)?(Z|[\+\-]\d{2}:\d{2}))/;
+			re_date = /^(\d{4})\-(\d{2})\-(\d{2})T(\d{2}):(\d{2}):(\d{2})(\.\d+)?(Z|[\+\-](\d{2}):(\d{2}))?$/;
+			
 		if (m = date_str.match(re_date)) {
-			result.setFullYear(toInt(m[0]));
-			result.setMonth(toInt(m[1]) - 1);
-			result.setDate(toInt(m[2]) - 1);
+			result.setUTCFullYear(toInt(m[1]));
+			result.setUTCMonth(toInt(m[2]) - 1);
+			result.setUTCDate(toInt(m[3]));
+			
+			var hh = toInt(m[4]), 
+				mm = toInt(m[5]),
+				ss = toInt(m[6]);
+				
+			switch ((m[8] || ' ').charAt(0)) {
+				case '-':
+					hh += toInt(m[9]);
+					mm += toInt(m[10]);
+					break;
+				case '+':
+					hh += toInt(m[9]);
+					mm += toInt(m[10]);
+					break;
+			}
+			
+			result.setUTCHours(hh, mm, ss, parseFloat(m[7] || 0));
+			return result;
+		}
+	}
+	
+	/**
+	 * @class
+	 * @param {String|Document} data Content of the playlist.
+	 */
+	function XSPFPlaylist(data) {
+		if (typeof data == 'string')
+			data = toXML(data);
+			
+		if (data) {
+			var children = processNode(data.documentElement, playlist_fields, this);
+			if (this.date)
+				this.date = parseDate(this.date);
+			
+			if (children.trackList) {
+				this.trackList = [];
+				this.tracks = [];
+				
+				var re_ext = /\.(\w+)$/,
+					tracks = children.trackList.getElementsByTagName('track');
+					
+				for (var i = 0, il = tracks.length; i < il; i++) {
+					var t = new XSPFTrack(tracks[i], this);
+					this.trackList.push(t);
+					
+					// add some sugar
+					var track_obj = {};
+					for (var j = 0, jl = t.location.length; j < jl; j++) {
+						var m_ext = t.location[j].match(re_ext);
+						if (m_ext) {
+							track_obj[m_ext[1]] = {
+								location: t.location[j],
+								id: t.identifier[j] || null,
+								playlist: this
+							};
+						}
+					}
+					
+					this.tracks.push(track_obj);
+				}
+			}
 		}
 	}
 	
 	/**
 	 * Track entry for XSPF playlist. Should be instantiated inside XSPF() constructor
 	 * @class
-	 * @param {Node} node XML node that represents track information
+	 * @param {Element} node XML node that represents track information
 	 * @param {XSPF} playlist Backreference to containing playlist
 	 */
 	function XSPFTrack(node, playlist) {
+		var children = processNode(node, track_fields, this);
 		
+		this.playlist = playlist;
+		
+		// do some postprocessing
+		if (this.trackNum) this.trackNum = toInt(this.trackNum);
+		if (this.duration) this.duration = toInt(this.duration);
+		
+		// find all multifields
+		var tags, name;
+		for (var i = 0, il = track_multi_fields.length; i < il; i++) {
+			name = track_multi_fields[i];
+			tags = node.getElementsByTagName(name);
+			this[name] = [];
+			for (var j = 0, jl = tags.length; j < jl; j++) {
+				this[name].push(tags[j].firstChild.nodeValue);
+			}
+		}
 	}
 	
 	/**
+	 * @class
 	 * @param {String|Document} data Content of the playlist.
 	 */
-	return function(data) {
-		if (typeof data == 'string')
-			data = toXML(data);
-			
-		if (data) {
-			var children = processNode(data.documentElement, playlist_fields, this);
-			
-		}
-	}
+	return XSPFPlaylist;
 })();
