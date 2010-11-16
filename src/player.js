@@ -8,7 +8,38 @@
 	 * Use single instance of internal audio player for better performance
 	 * and control
 	 */
-	var audio_instance;
+	var audio_instance,
+		format = 'mp3';
+	
+	// get info about current environment
+	if (window.Audio) {
+		audio_instance = new Audio();
+		audio_instance.autoplay = false;
+		audio_instance.loop = false;
+		audio_instance.preload = false;
+		
+		if (canPlay(audio_instance, 'audio/mpeg'))
+			format = 'mp3';
+		else if (canPlay(audio_instance, 'audio/ogg'))
+			format = 'ogg';
+		else
+			format = '';
+	}
+	
+	var env = {
+		is_native: !!audio_instance && format
+	};
+	
+	/**
+	 * Check if media source can play specified media type
+	 * @param {MediaSource} media
+	 * @param {String} mime
+	 * @return {Boolean}
+	 */
+	function canPlay(media, mime) {
+		var r = media.canPlayType('audio/mpeg');
+		return r && r != 'no';
+	}
 	
 	/**
 	 * Native HTML5 audioplayer
@@ -134,5 +165,5 @@
 		}
 	};
 	
-	return Player || {}; // || {} is needed for Spket editor to show code outline
+	return NativePlayer || {}; // || {} is needed for Spket editor to show code outline
 })();

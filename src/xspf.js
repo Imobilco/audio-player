@@ -11,12 +11,14 @@
  * @link http://chikuyonok.ru
  * 
  * @class
+ * @inherits IPlaylist
  * 
  * @example
  * var playlist = new XSPF('http://mysite.com/playlist.xspf');
  * alert(playlist.title);
  * 
  * @param {String|Document} data Content of the playlist.
+ * @include "IPlaylist.js"
  */
 var XSPF = (function(){
 	var playlist_fields = ['title', 'creator', 'annotation', 'info', 'identifier', 'image', 'date', 'location'],
