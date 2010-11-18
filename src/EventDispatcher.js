@@ -1,15 +1,12 @@
 /**
- * Context object that receives all playback events from playback controller
- * and do something (e.g. updates playhead position of player's DOM representation)
- * 
  * @author Sergey Chikuyonok (serge.che@gmail.com)
  * @link http://chikuyonok.ru
- */function PlaybackContext() {
+ */function EventDispatcher() {
 	this.listenerChain = {};
 	
 }
 
-PlaybackContext.prototype = {
+EventDispatcher.prototype = {
 	/**
 	 * Adds event listener
 	 * @param {String|Array} type Event name(s), an array of strings or space-separated string
@@ -113,4 +110,3 @@ PlaybackContext.prototype = {
 		return true;
 	}
 }
-

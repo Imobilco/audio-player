@@ -1,0 +1,87 @@
+.imob-player {
+	position:relative;
+	font-family:arial, sans-serif;
+	font-size:12px;
+	color:#fff;
+	padding-left:35px;
+}
+
+.imob-player-shaft {
+	position:relative;
+	height:13px;
+}
+
+.imob-player-shaft-bar {
+	position:absolute;
+	width:100%;
+	height:1px;
+	background:#808080;
+	top:6px;
+}
+
+.imob-player-progress {
+	position:absolute;
+	top:6px;
+	z-index:2;
+	height:1px;
+	background:#fff;
+}
+
+.imob-player-playhead {
+	position:absolute;
+	width:14px;
+	height:5px;
+	background:#fff;
+	top:4px;
+	z-index:3;
+}
+
+.imob-player-play-button {
+	display:block;
+	width:20px;
+	height:20px;
+	zoom:1;
+	background:url(../i/button-bg.png) -20px 0 #353535 no-repeat;
+	left:0;
+	position:absolute;
+	cursor:pointer;
+	overflow:hidden;
+	
+	-webkit-border-radius: 3px;	-moz-border-radius: 3px;	border-radius: 3px;
+	
+	-webkit-box-shadow: 0 1px 1px rgba(0,0,0,0.7);	-moz-box-shadow: 0 1px 1px rgba(0,0,0,0.7);	-ms-box-shadow: 0 1px 1px rgba(0,0,0,0.7);	box-shadow: 0 1px 1px rgba(0,0,0,0.7);
+}
+
+.imob-player-labels {
+	line-height:20px;
+	white-space:nowrap;
+	position:relative;
+}
+
+.imob-player-play-icon {
+	display:inline-block;
+	width:40px;
+	height:20px;
+	background:url(../i/icons.png) no-repeat;
+	position:relative;
+}
+
+.imob-player-playing .imob-player-play-icon {
+	left:-20px;
+}
+
+.imob-player-track-num {
+	color:#666;
+	margin-right:0.4em;
+}
+
+.imob-player-track-last-play {
+	color:#458ff0;
+	margin-left:0.4em;
+}
+
+.imob-player-time {
+	position:absolute;
+	right:0;
+	color:#666;
+}
