@@ -135,27 +135,49 @@ var XSPF = (function(){
 				this.tracks = [];
 				
 				var re_ext = /\.(\w+)$/,
-					tracks = children.trackList.getElementsByTagName('track');
+					tracks = children.trackList.getElementsByTagName('track'),
+					containers = {},
+					ext,
+					_tracks;
 					
 				for (var i = 0, il = tracks.length; i < il; i++) {
 					var t = new XSPFTrack(tracks[i], this);
 					this.trackList.push(t);
 					
-					// add some sugar
-					var track_obj = {};
+					// implement IPlaylistItem interface
 					for (var j = 0, jl = t.location.length; j < jl; j++) {
 						var m_ext = t.location[j].match(re_ext);
 						if (m_ext) {
-							track_obj[m_ext[1]] = {
+							ext = m_ext[1].toLowerCase();
+							if (!(ext in containers))
+								containers[ext] = {
+									tracks: [],
+									type: ext
+								};
+							
+							_tracks = containers[ext].tracks;
+							
+							var prev_track = _tracks.length ? _tracks[_tracks.length - 1] : null;
+							
+							var new_track = {
 								location: t.location[j],
 								id: t.identifier[j] || null,
-								playlist: this
+								title: t.title || '',
+								trackNum: t.trackNum || null,
+								prevTrack: prev_track,
+								nextTrack: null,
+								playlist: containers[ext]
 							};
+							
+							if (prev_track)
+								prev_track.nextTrack = new_track;
+							
+							_tracks.push(new_track);
 						}
 					}
-					
-					this.tracks.push(track_obj);
 				}
+				
+				this.containers = containers;
 			}
 		}
 	}

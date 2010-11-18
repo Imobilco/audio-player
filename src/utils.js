@@ -462,3 +462,30 @@ function toBoolean(val) {
 		return (val == 'true' || val == 'yes' || val == '1'); 
 	
 }
+
+/**
+ * Format time in hh:mm:ss format
+ * @param {Number} ms Time in milliseconds
+ * @return {String}
+ */
+function formatTime(ms) {
+	var s = 60 * 1000,
+		m = s * 60,
+		h = m * 60,
+		result = [],
+		pad = function(num) {
+			return (num < 10 ? '0' : '') + num;
+		};
+		
+	var hours = Math.floor(ms / h),
+		minutes = Math.floor((ms - h * hours) / m),
+		seconds = Math.round((ms - h * hours - m * minutes) / s);
+		
+	if (hours)
+		result.push(pad(hours));
+		
+	result.push(pad(minutes));
+	result.push(pad(seconds));
+	
+	return result.join(':');
+}

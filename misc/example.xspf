@@ -11,14 +11,17 @@
 			<trackNum>1</trackNum>
 			<duration>123123</duration> <!-- milliseconds -->
 			<album>Этногенез</album>
+			<title>Sample track 1</title>
 		</track>
 		<track>
 			<location>file:///mp3s/song_2.mp3</location>
 			<location>file:///mp3s/song_2.ogg</location>
+			<title>Sample track 2</title>
 		</track>
 		<track>
 			<location>file:///mp3s/song_3.mp3</location>
 			<location>file:///mp3s/song_3.ogg</location>
+			<title>Sample track 3</title>
 		</track>
 	</trackList>
 </playlist>
