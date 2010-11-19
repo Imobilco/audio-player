@@ -117,6 +117,14 @@ var XSPF = (function(){
 		}
 	}
 	
+	var _global_id = 0;
+	/**
+	 * Generates unique ID for track item
+	 */
+	function generateId() {
+		return 'xspf__' + (_global_id++); 
+	}
+	
 	/**
 	 * @class
 	 * @param {String|Document} data Content of the playlist.
@@ -166,7 +174,8 @@ var XSPF = (function(){
 								trackNum: t.trackNum || null,
 								prevTrack: prev_track,
 								nextTrack: null,
-								playlist: containers[ext]
+								playlist: containers[ext],
+								duration: parseInt(t.duration || 0, 10)
 							};
 							
 							if (prev_track)
@@ -205,6 +214,17 @@ var XSPF = (function(){
 			this[name] = [];
 			for (var j = 0, jl = tags.length; j < jl; j++) {
 				this[name].push(tags[j].firstChild.nodeValue);
+			}
+		}
+		
+		// check that id exists
+		if (!('identifier' in this))
+			this.identifier = [];
+		
+		if (this.location) {
+			for (var i = 0, il = this.location.length; i < il; i++) {
+				if (!this.identifier[i])
+					this.identifier[i] = generateId();
 			}
 		}
 	}

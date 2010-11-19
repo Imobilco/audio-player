@@ -25,16 +25,38 @@ var playbackContext = (function(){
 		
 		max_play_progress = 0;
 		
+	function updateUI(position, duration) {
+		if (!root)
+			return;
+			
+		var max_width = ct_shaft.offsetWidth - ct_playhead.offsetWidth,
+			prc = position / duration,
+			pos_x = Math.round(max_width * prc);
+			
+		setCSS(ct_playhead, {left: pos_x});
+		setCSS(ct_progress, {width: pos_x});
+		updatePlayProgress(prc);
+	}
+	
+	function updatePlayProgress(prc) {
+		if (max_play_progress < prc)
+			max_play_progress = prc;
+			
+		setCSS(ct_play_button, {backgroundPosition: Math.round(-20 * (1 - max_play_progress)) + 'px 0px'});
+	}
+		
 	dispatcher.addEventListener('play', function() {
-		console.log('got play');
 		if (root)
 			addClass(root, 'imob-player-playing');
 	});
 	
 	dispatcher.addEventListener('pause', function() {
-		console.log('got pause');
 		if (root)
 			removeClass(root, 'imob-player-playing');
+	});
+	
+	dispatcher.addEventListener('playing', function(evt) {
+		updateUI(evt.data.position, evt.data.duration);
 	});
 		
 	return {
@@ -67,23 +89,7 @@ var playbackContext = (function(){
 		 * @param {Number} position Media duration 
 		 * @param {Number} duration Current media playback position 
 		 */
-		updateUI: function(position, duration) {
-			if (!root)
-				return;
-				
-			var max_width = ct_shaft.offsetWidth - ct_playhead.offsetWidth,
-				prc = position / duration,
-				pos_x = Math.round(max_width * prc);
-				
-			setCSS(ct_playhead, {left: pos_x});
-			setCSS(ct_progress, {width: pos_x});
-			this.updatePlayProgress(prc);
-		},
+		updateUI: updateUI,
 		
-		updatePlayProgress: function(prc) {
-			if (max_play_progress < prc)
-				max_play_progress = prc;
-				
-			setCSS(ct_play_button, {backgroundPosition: Math.round(-20 * (1 - max_play_progress)) + 'px 0px'});
-		}
+		updatePlayProgress: updatePlayProgress
 	}})();

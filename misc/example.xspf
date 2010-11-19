@@ -6,7 +6,7 @@
 	
 	<trackList>
 		<track>
-			<location>file:///mp3s/song_1.mp3</location>
+			<location>../test/sample1.mp3</location>
 			<location>file:///mp3s/song_1.ogg</location>
 			<trackNum>1</trackNum>
 			<duration>123123</duration> <!-- milliseconds -->
@@ -14,14 +14,16 @@
 			<title>Sample track 1</title>
 		</track>
 		<track>
-			<location>file:///mp3s/song_2.mp3</location>
+			<location>../test/sample2.mp3</location>
 			<location>file:///mp3s/song_2.ogg</location>
 			<title>Sample track 2</title>
+			<duration>123123</duration>
 		</track>
 		<track>
-			<location>file:///mp3s/song_3.mp3</location>
+			<location>../test/sample3.mp3</location>
 			<location>file:///mp3s/song_3.ogg</location>
 			<title>Sample track 3</title>
+			<duration>123123</duration>
 		</track>
 	</trackList>
 </playlist>

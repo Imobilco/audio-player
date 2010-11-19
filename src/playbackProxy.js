@@ -4,7 +4,7 @@
  * @link http://chikuyonok.ru
  * 
  * @include "utils.js"
- * @include "PlaybackContext.js"
+ * @include "playbackContext.js"
  */
 
 var playbackProxy = (function(){
@@ -38,8 +38,12 @@ var playbackProxy = (function(){
 	}
 	
 	function updateContext() {
-		if (context)
-			context.updateUI(media.currentTime, media.duration);
+		if (context) {
+			context.dispatchEvent('playing', {
+				position: media.currentTime,
+				duration: media.duration
+			});
+		}
 	}
 		
 	/**
@@ -77,12 +81,20 @@ var playbackProxy = (function(){
 		},
 		
 		/**
+		 * Returns player UI context
+		 * @return {playbackContext}
+		 */
+		getContext: function() {
+			return context;
+		},
+		
+		/**
 		 * Set current playback media source
 		 * @param {String} url
 		 */
 		setSource: function(url) {
 			if (this.getSource() != url) {
-				media.pause();
+				this.pause();
 				media.src = url;
 			}
 		},
@@ -107,6 +119,7 @@ var playbackProxy = (function(){
 		 */
 		pause: function() {
 			media.pause();
+			onPlaybackPause();
 		},
 		
 		/**
@@ -119,6 +132,13 @@ var playbackProxy = (function(){
 				media.volume = parseFloat(val);
 				
 			return media.volume;
+		},
+		
+		togglePlayback: function() {
+			if (media.paused)
+				this.play();
+			else
+				this.pause();
 		}
 	};
 })();

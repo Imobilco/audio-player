@@ -469,7 +469,7 @@ function toBoolean(val) {
  * @return {String}
  */
 function formatTime(ms) {
-	var s = 60 * 1000,
+	var s = 1000,
 		m = s * 60,
 		h = m * 60,
 		result = [],
@@ -489,3 +489,50 @@ function formatTime(ms) {
 	
 	return result.join(':');
 }
+
+/**
+ * Data storage bound to event
+ */
+var elemDataStorage = (function(){
+	/**
+	 * Returns element's storage ID
+	 * @param {Element} elem
+	 * @return {String}
+	 */
+	function getDataId(elem) {
+		var data_id = elem.getAttribute('sliderData');
+		if (!data_id) {
+			data_id = 'slider' + (_data_id++);
+			elem.setAttribute('sliderData', data_id);
+			elem_data[data_id] = {};
+		}
+		
+		return data_id;
+	}
+	
+	return {
+		/**
+		 * Returns data from element storage
+		 * @param {Element} elem 
+		 * @param {String} name Ключ для получения данных
+		 * @return {Object|null}
+		 */
+		getData: function(elem, name) {
+			var id = getDataId(elem);
+			if (name in elem_data[id])
+				return elem_data[id][name];
+			else
+				return null;
+		},
+		
+		/**
+		 * Stores data in element's storage
+		 * @param {Element} elem
+		 * @param {String} name
+		 * @param {Object} value
+		 */
+		setData: function(elem, name, value) {
+			elem_data[getDataId(elem)][name] = value;
+		}
+	}
+})();
