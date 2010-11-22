@@ -45,6 +45,12 @@ var playbackProxy = (function(){
 			});
 		}
 	}
+	
+	function delegateEvent(evt) {
+		if (context) {
+			context.dispatchEvent(evt.type);
+		}
+	}
 		
 	/**
 	 * Attaches playback events to media element to keep track of its progress
@@ -52,7 +58,8 @@ var playbackProxy = (function(){
 	 */
 	function attachEvents(elem) {
 		addEvent(elem, 'play', onPlaybackStart);
-		addEvent(elem, 'pause', onPlaybackPause);
+		addEvent(elem, 'pause ended', onPlaybackPause);
+		addEvent(elem, 'ended', delegateEvent);
 	}
 	
 	return {

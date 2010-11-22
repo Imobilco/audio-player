@@ -13,7 +13,10 @@
 (function(){
 	var is_global_events_bound = false,
 		player_root_class = 'imob-player',
-		active_player_class = 'imob-player-active';
+		active_player_class = 'imob-player-active',
+		default_options = {
+			auto_next: true
+		};
 	
 	function bindGlobalEvents() {
 		if (is_global_events_bound)
@@ -39,39 +42,28 @@
 		return null;
 	}
 	
+	/**
+	 * Returns playlist's ID of the track
+	 * @param {Element} elem UI element that represents track
+	 * @return {String|null}
+	 */
+	function getTrackId(elem) {
+		return elem ? elem.getAttribute('data-playitem-id') : null;
+	}
+	
 	
 	/**
 	 * Binds local events on container for speed improvement
 	 * @param {Playlist} ctx
 	 */
 	function bindLocalEvents(ctx) {
-		addEvent(ctx.continer, 'click', function(evt) {
+		var wrapped = function(evt) {
 			ctx.dispatchEvent(evt);
-		});
-	}
-	
-	/**
-	 * Dispatches incoming event
-	 * @param {Event} evt
-	 */
-	function dispatchEvent(evt) {
-		switch (evt.type) {
-			case 'click':
-				if (bubbleSearch(evt.target, 'imob-player-play-button')) {
-					switchTrack(bubbleSearch(evt.target, player_root_class));
-				}
-				
-				break;
-		}
-	}
-	
-	/**
-	 * Play specified track
-	 */
-	function switchTrack(player_elem) {
+		};
 		
+		addEvent(ctx.continer, 'click', wrapped);
+		ctx.proxy.getContext().addEventListener('ended', wrapped);
 	}
-	
 	
 	/**
 	 * Playlist controller
@@ -80,11 +72,13 @@
 	 * @param {Element} container Element where to store player controls
 	 * @param {playbackProxy} proxy Media proxy element
 	 */
-	var Playlist = this.Playlist = function(list, container, proxy) {
+	var Playlist = this.Playlist = function(list, container, proxy, options) {
 		this.list = list;
 		this.continer = container;
 		/** @type {playbackProxy} */
 		this.proxy = proxy;
+		
+		this.options = mergeObjects(default_options, options || {});
 		
 		/** @type {Element[]} */
 		this._tracks_ui = [];
@@ -122,7 +116,12 @@
 						evt.stopPropagation();
 					}
 					
-					
+					break;
+				case 'ended':
+					var cur_track_ix = this.getTrackIndex(this.proxy.getContext().getRoot());
+					if (cur_track_ix != -1 && cur_track_ix < this.list.tracks.length - 1) {
+						this.switchTrack(this._tracks_ui[cur_track_ix + 1]);
+					}
 					break;
 			}
 		},
@@ -137,30 +136,59 @@
 				return;
 			}
 			
-			var track_id = player_elem.getAttribute('data-playitem-id');
-			if (track_id) {
-				var track;
+			var track = this.findTrack(player_elem);
+			if (track) {
+				// disable previuos track
+				for (var j = 0, jl = this._tracks_ui.length; j < jl; j++) {
+					removeClass(this._tracks_ui[j], active_player_class);
+				}
+				
+				//activate current track
+				addClass(player_elem, active_player_class);
+				
+				this.proxy.setSource(track.location);
+				this.proxy.getContext().bindElement(player_elem);
+				this.proxy.play();
+			} else {
+				console.log('track not found');
+			}
+		},
+		
+		/**
+		 * Finds track record in playlist by its ID or UI element
+		 * @return {IPlaylistItem|null}
+		 */
+		findTrack: function(item) {
+			var ix = this.getTrackIndex(item);
+			return ix != -1 ? this.list.tracks[ix] : null;
+		},
+		
+		/**
+		 * Returns track's index in playlist by its ID or UI element
+		 * @param {String|Element} item Track ID or UI element's pointer
+		 * @return {Number} Zero-based index or -1 if track wasn't found
+		 */
+		getTrackIndex: function(item) {
+			if (typeof item != 'string') {
+				item = getTrackId(bubbleSearch(item, player_root_class))
+			}
+			
+			if (item) {
 				for (var i = 0, il = this.list.tracks.length; i < il; i++) {
-					track = this.list.tracks[i];
-					if (track.id == track_id) {
-						// disable previuos track
-						for (var j = 0, jl = this._tracks_ui.length; j < jl; j++) {
-							removeClass(this._tracks_ui[j], active_player_class);
-						}
-						
-						//activate current track
-						addClass(player_elem, active_player_class);
-						
-						this.proxy.setSource(track.location);
-						this.proxy.getContext().bindElement(player_elem);
-						this.proxy.play();
-						
-						return;
-					}
+					if (this.list.tracks[i].id == item)
+						return i;
 				}
 			}
 			
-			console.log('track not found');
+			return -1;
+		},
+		
+		/**
+		 * Returns option value
+		 * @return {Object}
+		 */
+		getOption: function(name) {
+			return this.options[name];
 		}
 	}
 })();

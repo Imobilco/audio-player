@@ -91,5 +91,12 @@ var playbackContext = (function(){
 		 */
 		updateUI: updateUI,
 		
-		updatePlayProgress: updatePlayProgress
+		updatePlayProgress: updatePlayProgress,
+		
+		/**
+		 * @return {Element}
+		 */
+		getRoot: function() {
+			return root;
+		}
 	}})();
