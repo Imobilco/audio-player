@@ -87,12 +87,16 @@ EventDispatcher.prototype = {
 		if(!this.hasEventListener(type))
 			return false;
 			
+		/** @type {Array} */
 		var list = this.listenerChain[type],
 			to_delete = [],
 			evt = {
 				type: type,
 				target: this
 			};
+			
+		if (this.listenerChain['*'])
+			list = list.concat(this.listenerChain['*']);
 			
 		if (typeof args != 'undefined')
 			evt.data = args;
