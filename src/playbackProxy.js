@@ -28,6 +28,40 @@ var playbackProxy = (function(){
 	 * @param {Event}
 	 */
 	function onPlaybackPause(evt) {
+		pause();
+	}
+	
+	/**
+	 * Playback reached the end of the track
+	 * @param {Event} evt
+	 */
+	function onEnded(evt) {
+		if (!media.loop) {
+			seek(0);
+			pause();
+		}
+			
+		delegateEvent(evt);
+	}
+	
+	/**
+	 * Seek current track at specified position
+	 * @param {Number} pos New position (in seconds)
+	 */
+	function seek(pos) {
+		media.currentTime = pos;
+		context.dispatchEvent('seek', {
+			position: pos,
+			percent: pos / media.duration,
+			duration: media.duration
+		});
+	}
+	
+	/**
+	 * Pause playback
+	 */
+	function pause() {
+		media.pause();
 		clearTimer();
 		context.dispatchEvent('pause');
 	}
@@ -59,7 +93,7 @@ var playbackProxy = (function(){
 	function attachEvents(elem) {
 		addEvent(elem, 'play', onPlaybackStart);
 		addEvent(elem, 'pause ended', onPlaybackPause);
-		addEvent(elem, 'ended', delegateEvent);
+		addEvent(elem, 'ended', onEnded);
 	}
 	
 	return {
@@ -124,10 +158,7 @@ var playbackProxy = (function(){
 		/**
 		 * Pause playback
 		 */
-		pause: function() {
-			media.pause();
-			onPlaybackPause();
-		},
+		pause: pause,
 		
 		/**
 		 * Get/set new volume
@@ -141,11 +172,45 @@ var playbackProxy = (function(){
 			return media.volume;
 		},
 		
+		/**
+		 * Toggles playback of current track
+		 */
 		togglePlayback: function() {
 			if (media.paused)
 				this.play();
 			else
 				this.pause();
+		},
+		
+		/**
+		 * Seek current track at specified position
+		 * @param {Number} pos New position (in seconds)
+		 */
+		seek: seek,
+		
+		/**
+		 * Seek current track at specified position
+		 * @param {Number} pos New position (from 0.0 to 1.0)
+		 */
+		seekPercent: function(pos) {
+			seek(media.duration * pos);
+		},
+		
+		/**
+		 * Check if current track playback is looped
+		 * @return {Boolean}
+		 */
+		isLoop: function() {
+			return media.loop;
+		},
+		
+		/**
+		 * Enable or disable current track playback looping
+		 * @param {Boolean} val
+		 */
+		setLooping: function(val) {
+			media.loop = !!val;
 		}
+		
 	};
 })();

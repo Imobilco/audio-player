@@ -55,7 +55,7 @@ var playbackContext = (function(){
 			removeClass(root, 'imob-player-playing');
 	});
 	
-	dispatcher.addEventListener('playing', function(evt) {
+	dispatcher.addEventListener('playing seek', function(evt) {
 		updateUI(evt.data.position, evt.data.duration);
 	});
 		
