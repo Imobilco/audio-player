@@ -7,12 +7,11 @@
  * @include "EventDispatcher.js"
  * @include "utils.js"
  * @include "playbackProxy.js"
- * @include "events.js"
+ * @include "eventManager.js"
  */
 var playbackContext = (function(){
-	var dispatcher = new EventDispatcher,
-		/** @type {Element} Root element of for player controls */
-		root,
+	/** @type {Element} Root element of for player controls */
+	var root,
 		/** @type {Element} Playhead control */
 		ct_playhead,
 		
@@ -112,7 +111,7 @@ var playbackContext = (function(){
 		updateSlider(coord_source.pageX - offset.x - ct_playhead.offsetWidth / 2);
 		drag_start_pos.tx = toNum(getCSS(ct_playhead, 'left'));
 		
-		dispatcher.dispatchEvent(EVT_PLAYHEAD_DRAG_START, playbackContext);
+		eventManager.dispatchEvent(EVT_PLAYHEAD_DRAG_START, playbackContext);
 		
 		evt.preventDefault();
 		return false;
@@ -127,7 +126,7 @@ var playbackContext = (function(){
 			var coord_source = getCoordSource(evt, 'touchmove');
 			updateSlider(coord_source.pageX - drag_start_pos.x);
 			
-			dispatcher.dispatchEvent(EVT_PLAYHEAD_DRAG_MOVE, playbackContext);
+			eventManager.dispatchEvent(EVT_PLAYHEAD_DRAG_MOVE, playbackContext);
 			evt.preventDefault();
 			return false;
 		}
@@ -142,7 +141,7 @@ var playbackContext = (function(){
 			if (was_playing)
 				proxy.play();
 				
-			dispatcher.dispatchEvent(EVT_PLAYHEAD_DRAG_STOP, playbackContext);
+			eventManager.dispatchEvent(EVT_PLAYHEAD_DRAG_STOP, playbackContext);
 		}
 		
 		was_playing = is_dragging = false;
@@ -151,18 +150,18 @@ var playbackContext = (function(){
 	addEvent(document, 'mousemove touchmove', doDrag);
 	addEvent(document, 'mouseup touchend', stopDrag);
 		
-	dispatcher.addEventListener(EVT_PLAY, function() {
+	eventManager.addEventListener(EVT_PLAY, function() {
 		if (root)
 			addClass(root, 'imob-player-playing');
 	});
 	
-	dispatcher.addEventListener(EVT_PAUSE, function() {
+	eventManager.addEventListener(EVT_PAUSE, function() {
 		if (root)
 			removeClass(root, 'imob-player-playing');
 	});
 	
 	// update loaded range
-	dispatcher.addEventListener(EVT_LOAD_PROGRESS, function(evt) {
+	eventManager.addEventListener(EVT_LOAD_PROGRESS, function(evt) {
 		if (ct_load_progress)
 			setCSS(ct_load_progress, {
 				left: (evt.data.start * 100) + '%',
@@ -170,22 +169,11 @@ var playbackContext = (function(){
 			});
 	});
 	
-	dispatcher.addEventListener([EVT_PLAYING, EVT_SEEK], function(evt) {
+	eventManager.addEventListener([EVT_PLAYING, EVT_SEEK], function(evt) {
 		updateUI(evt.data.position, evt.data.duration);
 	});
 	
 	return {
-		dispatchEvent: function(type, args) {
-			dispatcher.dispatchEvent(type, args);
-		},
-		
-		addEventListener: function(type, fn, only_once) {
-			dispatcher.addEventListener(type, fn, only_once);
-		},
-		
-		removeEventListener: function(type, fn) {
-			dispatcher.removeEventListener(type, fn);
-		},
 		
 		/**
 		 * Binds element as player container
@@ -203,7 +191,7 @@ var playbackContext = (function(){
 				updateMaxSliderPos();
 				
 				addEvent(ct_shaft, 'mousedown touchstart', startDrag);
-				dispatcher.dispatchEvent(EVT_CHANGE_CONTEXT_ELEMENT, {
+				eventManager.dispatchEvent(EVT_CHANGE_CONTEXT_ELEMENT, {
 					oldElement: root, 
 					newElement: elem
 				});

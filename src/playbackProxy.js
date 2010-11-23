@@ -5,7 +5,7 @@
  * 
  * @include "utils.js"
  * @include "playbackContext.js"
- * @include "events.js"
+ * @include "eventManager.js"
  */
 
 var playbackProxy = (function(){
@@ -22,7 +22,7 @@ var playbackProxy = (function(){
 	function onPlaybackStart(evt) {
 		clearTimer();
 		play_timer = setInterval(updateContext, 15);
-		context.dispatchEvent(EVT_PLAY);
+		eventManager.dispatchEvent(EVT_PLAY);
 	}
 	
 	/**
@@ -51,7 +51,7 @@ var playbackProxy = (function(){
 	 */
 	function onProgress(evt) {
 		var range = media.buffered;
-		context.dispatchEvent(EVT_LOAD_PROGRESS, {
+		eventManager.dispatchEvent(EVT_LOAD_PROGRESS, {
 			start: range.start(0) / media.duration,
 			end: range.end(range.length - 1) / media.duration
 		});
@@ -63,7 +63,7 @@ var playbackProxy = (function(){
 	 */
 	function seek(pos) {
 		media.currentTime = pos;
-		context.dispatchEvent(EVT_SEEK, {
+		eventManager.dispatchEvent(EVT_SEEK, {
 			position: pos,
 			percent: pos / media.duration,
 			duration: media.duration
@@ -76,7 +76,7 @@ var playbackProxy = (function(){
 	function pause() {
 		media.pause();
 		clearTimer();
-		context.dispatchEvent(EVT_PAUSE);
+		eventManager.dispatchEvent(EVT_PAUSE);
 	}
 	
 	function clearTimer() {
@@ -85,18 +85,14 @@ var playbackProxy = (function(){
 	}
 	
 	function updateContext() {
-		if (context) {
-			context.dispatchEvent(EVT_PLAYING, {
-				position: media.currentTime,
-				duration: media.duration
-			});
-		}
+		eventManager.dispatchEvent(EVT_PLAYING, {
+			position: media.currentTime,
+			duration: media.duration
+		});
 	}
 	
 	function delegateEvent(evt) {
-		if (context) {
-			context.dispatchEvent(evt.type);
-		}
+		eventManager.dispatchEvent(evt.type);
 	}
 		
 	/**
@@ -153,7 +149,7 @@ var playbackProxy = (function(){
 			if (this.getSource() != url) {
 				this.pause();
 				media.src = url;
-				context.dispatchEvent(EVT_SOURCE_CHANGED, this.getSource());
+				eventManager.dispatchEvent(EVT_SOURCE_CHANGED, this.getSource());
 			}
 		},
 		
@@ -191,7 +187,7 @@ var playbackProxy = (function(){
 		 */
 		setVolume: function(val) {
 			media.volume = parseFloat(val);
-			context.dispatchEvent(EVT_VOLUME, media.volume);
+			eventManager.dispatchEvent(EVT_VOLUME, media.volume);
 		},
 		
 		/**
@@ -232,7 +228,7 @@ var playbackProxy = (function(){
 		 */
 		setLoop: function(val) {
 			media.loop = !!val;
-			context.dispatchEvent(EVT_LOOPING_CHANGED, media.volume);
+			eventManager.dispatchEvent(EVT_LOOPING_CHANGED, media.volume);
 		},
 		
 		/**

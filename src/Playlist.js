@@ -7,7 +7,7 @@
  * @include "playbackProxy.js"
  * @include "playbackContext.js"
  * @include "utils.js"
- * 
+ * @include "eventManager.js"
  */
 
 (function(){
@@ -15,7 +15,7 @@
 		player_root_class = 'imob-player',
 		active_player_class = 'imob-player-active',
 		default_options = {
-			auto_next: true
+			auto_next: true // TODO implement
 		};
 	
 	function bindGlobalEvents() {
@@ -62,7 +62,7 @@
 		};
 		
 		addEvent(ctx.continer, 'click', wrapped);
-		ctx.proxy.getContext().addEventListener('ended', wrapped);
+		eventManager.addEventListener('ended', wrapped);
 	}
 	
 	/**
@@ -103,6 +103,7 @@
 		container.appendChild(f);
 		
 		Playlist.all.push(this);
+		eventManager.dispatchEvent(EVT_PLAYLIST_CREATED, this);
 	};
 	
 	Playlist.prototype = {

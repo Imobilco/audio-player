@@ -1,5 +1,5 @@
 /**
- * List of dispatched events, mostly by playback context
+ * List of all events dispatched by event manager
  * @author Sergey Chikuyonok (serge.che@gmail.com)
  * @link http://chikuyonok.ru
  */
@@ -69,4 +69,11 @@
 	 * as <code>start</code> (from 0.0 to 1.0) and <code>end</code> (from 0.0 to 1.0)
 	 * properties 
 	 */
-	EVT_LOAD_PROGRESS = 'progress';
+	EVT_LOAD_PROGRESS = 'progress',
+	
+	/**
+	 * Dispatched by <code>Playlist</code> global class when new playlist 
+	 * instance is created
+	 * <code>evt.data</code> points to new <code>Playlist</code> instance 
+	 */
+	EVT_PLAYLIST_CREATED = 'playlist_created';
