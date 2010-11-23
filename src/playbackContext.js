@@ -23,15 +23,28 @@ var playbackContext = (function(){
 		/** @type {Element} Play button that contains play progress */
 		ct_play_button,
 		
-		max_play_progress = 0;
+		max_play_progress = 0,
+		is_dragging = false,
+		
+		/** Dragging start point */
+		drag_start_pos = {},
+		/** Max slider head position */
+		max_slider_pos = 0;
 		
 	function updateUI(position, duration) {
 		if (!root)
 			return;
 			
-		var max_width = ct_shaft.offsetWidth - ct_playhead.offsetWidth,
-			prc = position / duration,
-			pos_x = Math.round(max_width * prc);
+		updateMaxSliderPos();
+		movePlayhead(position / duration);
+	}
+	
+	function updateMaxSliderPos() {
+		max_slider_pos = ct_shaft.offsetWidth - ct_playhead.offsetWidth;
+	}
+	
+	function movePlayhead(prc) {
+		var pos_x = Math.round(max_slider_pos * prc);
 			
 		setCSS(ct_playhead, {left: pos_x});
 		setCSS(ct_progress, {width: pos_x});
@@ -44,6 +57,76 @@ var playbackContext = (function(){
 			
 		setCSS(ct_play_button, {backgroundPosition: Math.round(-20 * (1 - max_play_progress)) + 'px 0px'});
 	}
+	
+	function toNum(val) {
+		return parseInt(val, 10) || 0;
+	}
+	
+	function minmax(val, abs_min, abs_max) {
+		return Math.min(abs_max, Math.max(abs_min, val));
+	}
+	
+	function getCoordSource(evt, touch_event) {
+		if (evt.type == touch_event) {
+			var touches = evt.changedTouches;
+			return touches[touches.length - 1];
+		} else {
+			return evt;
+		}
+	}
+	
+	function updateSlider(delta) {
+		// высчитываем текущую позицию головки слайдера
+		var pos = Math.min(max_slider_pos, Math.max(0, drag_start_pos.tx + delta));
+		movePlayhead(pos / max_slider_pos)
+	}
+	
+	/**
+	 * Начинаем перетаскивание слайдера
+	 * @param {Event} evt
+	 */
+	function startDrag(evt) {
+		var offset = getOffset(ct_playhead.offsetParent),
+			coord_source = getCoordSource(evt, 'touchstart');
+		
+		drag_start_pos.x = coord_source.pageX;
+		drag_start_pos.y = coord_source.pageY;
+		drag_start_pos.tx = 0;
+		drag_start_pos.ty = 0;
+		
+		is_dragging = true;
+		
+		// ставим головку в точку, куда тыкнули мышью
+		updateSlider(coord_source.pageX - offset.x - ct_playhead.offsetWidth / 2);
+		drag_start_pos.tx = toNum(getCSS(ct_playhead, 'left'));
+		
+		evt.preventDefault();
+		return false;
+	}
+	
+	/**
+	 * Обработчик события по перетаскиванию слайдера
+	 * @param {Event} evt
+	 */
+	function doDrag(evt) {
+		if (is_dragging) {
+			var coord_source = getCoordSource(evt, 'touchmove');
+			updateSlider(coord_source.pageX - drag_start_pos.x);
+			
+			evt.preventDefault();
+			return false;
+		}
+	}
+	
+	/**
+	 * Останавливаем перетаскивание слайдера
+	 */
+	function stopDrag() {
+		is_dragging = false;
+	}
+	
+	addEvent(document, 'mousemove touchmove', doDrag);
+	addEvent(document, 'mouseup touchend', stopDrag);
 		
 	dispatcher.addEventListener('play', function() {
 		if (root)
@@ -58,7 +141,7 @@ var playbackContext = (function(){
 	dispatcher.addEventListener('playing seek', function(evt) {
 		updateUI(evt.data.position, evt.data.duration);
 	});
-		
+	
 	return {
 		dispatchEvent: function(type, args) {
 			dispatcher.dispatchEvent(type, args);
@@ -77,11 +160,25 @@ var playbackContext = (function(){
 		 * @param {Element} elem
 		 */
 		bindElement: function(elem) {
-			root = elem;
-			ct_playhead = getOneByClass('imob-player-playhead', root);
-			ct_progress = getOneByClass('imob-player-progress', root);
-			ct_shaft = getOneByClass('imob-player-shaft', root);
-			ct_play_button = getOneByClass('imob-player-play-button', root);
+			if (root !== elem) {
+				this.unbindCurrentElement();
+				
+				ct_playhead = getOneByClass('imob-player-playhead', elem);
+				ct_progress = getOneByClass('imob-player-progress', elem);
+				ct_shaft = getOneByClass('imob-player-shaft', elem);
+				ct_play_button = getOneByClass('imob-player-play-button', elem);
+				updateMaxSliderPos();
+				
+				addEvent(ct_shaft, 'mousedown touchstart', startDrag);
+				root = elem;
+			}
+		},
+		
+		unbindCurrentElement: function() {
+			if (root && ct_shaft)
+				removeEvent(ct_shaft, 'mousedown touchstart', startDrag);
+				
+			root = null;
 		},
 		
 		/**
