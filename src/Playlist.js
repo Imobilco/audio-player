@@ -118,7 +118,7 @@
 					
 					break;
 				case 'ended':
-					if (!this.proxy.isLoop()) {
+					if (!this.proxy.getLoop()) {
 						var cur_track_ix = this.getTrackIndex(this.proxy.getContext().getRoot());
 						if (cur_track_ix != -1 && cur_track_ix < this.list.tracks.length - 1) {
 							this.switchTrack(this._tracks_ui[cur_track_ix + 1]);
@@ -192,6 +192,14 @@
 		 */
 		getOption: function(name) {
 			return this.options[name];
+		},
+		
+		/**
+		 * Returns UI context that represents player interface
+		 * @return {playbackContext}
+		 */
+		getUIContext: function() {
+			return this.proxy.getContext();
 		}
 	}
 })();

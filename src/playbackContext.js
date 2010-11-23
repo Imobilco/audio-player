@@ -26,6 +26,8 @@ var playbackContext = (function(){
 		
 		max_play_progress = 0,
 		is_dragging = false,
+		/** Is media source was playing when dragging occures? */
+		was_playing = false,
 		
 		/** Dragging start point */
 		drag_start_pos = {},
@@ -99,6 +101,8 @@ var playbackContext = (function(){
 		drag_start_pos.ty = 0;
 		
 		is_dragging = true;
+		was_playing = proxy.isPlaying();
+		proxy.pause();
 		
 		// ставим головку в точку, куда тыкнули мышью
 		updateSlider(coord_source.pageX - offset.x - ct_playhead.offsetWidth / 2);
@@ -126,7 +130,13 @@ var playbackContext = (function(){
 	 * Останавливаем перетаскивание слайдера
 	 */
 	function stopDrag() {
-		is_dragging = false;
+		if (is_dragging) {
+			proxy.seekPercent(toNum(getCSS(ct_playhead, 'left')) / max_slider_pos);
+			if (was_playing)
+				proxy.play();
+		}
+		
+		was_playing = is_dragging = false;
 	}
 	
 	addEvent(document, 'mousemove touchmove', doDrag);

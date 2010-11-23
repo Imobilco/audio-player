@@ -5,8 +5,8 @@
  * @include "../src/utils.js"
  */
 var audio = document.getElementById('test');
-audio.muted = true;
-audio.volume = 0;
+//audio.muted = true;
+//audio.volume = 0;
 playbackProxy.init(audio, playbackContext);
 
 $.get('../misc/example.xspf', function(data) {

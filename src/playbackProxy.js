@@ -138,6 +138,7 @@ var playbackProxy = (function(){
 			if (this.getSource() != url) {
 				this.pause();
 				media.src = url;
+				context.dispatchEvent('source_change', this.getSource());
 			}
 		},
 		
@@ -162,15 +163,20 @@ var playbackProxy = (function(){
 		pause: pause,
 		
 		/**
-		 * Get/set new volume
-		 * @param {Number} [val] New volume (from 0.0 to 1.0)
-		 * @return {Number} current volume (from 0.0 to 1.0)
+		 * Returns current source volume
+		 * @return {Number} from 0.0 to 1.0
 		 */
-		volume: function(val) {
-			if (typeof val != 'undefined')
-				media.volume = parseFloat(val);
-				
+		getVolume: function() {
 			return media.volume;
+		},
+		
+		/**
+		 * Set new volume
+		 * @param {Number} val New volume (from 0.0 to 1.0)
+		 */
+		setVolume: function(val) {
+			media.volume = parseFloat(val);
+			context.dispatchEvent('volume', media.volume);
 		},
 		
 		/**
@@ -201,7 +207,7 @@ var playbackProxy = (function(){
 		 * Check if current track playback is looped
 		 * @return {Boolean}
 		 */
-		isLoop: function() {
+		getLoop: function() {
 			return media.loop;
 		},
 		
@@ -209,8 +215,17 @@ var playbackProxy = (function(){
 		 * Enable or disable current track playback looping
 		 * @param {Boolean} val
 		 */
-		setLooping: function(val) {
+		setLoop: function(val) {
 			media.loop = !!val;
+			context.dispatchEvent('loop', media.volume);
+		},
+		
+		/**
+		 * Check if current media is playing
+		 * @return {Boolean}
+		 */
+		isPlaying: function() {
+			return !media.paused;
 		}
 		
 	};
