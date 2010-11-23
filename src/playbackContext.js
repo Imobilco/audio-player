@@ -7,6 +7,7 @@
  * @include "EventDispatcher.js"
  * @include "utils.js"
  * @include "playbackProxy.js"
+ * @include "events.js"
  */
 var playbackContext = (function(){
 	var dispatcher = new EventDispatcher,
@@ -108,6 +109,8 @@ var playbackContext = (function(){
 		updateSlider(coord_source.pageX - offset.x - ct_playhead.offsetWidth / 2);
 		drag_start_pos.tx = toNum(getCSS(ct_playhead, 'left'));
 		
+		dispatcher.dispatchEvent(EVT_PLAYHEAD_DRAG_START, playbackContext);
+		
 		evt.preventDefault();
 		return false;
 	}
@@ -121,6 +124,7 @@ var playbackContext = (function(){
 			var coord_source = getCoordSource(evt, 'touchmove');
 			updateSlider(coord_source.pageX - drag_start_pos.x);
 			
+			dispatcher.dispatchEvent(EVT_PLAYHEAD_DRAG_MOVE, playbackContext);
 			evt.preventDefault();
 			return false;
 		}
@@ -134,6 +138,8 @@ var playbackContext = (function(){
 			proxy.seekPercent(toNum(getCSS(ct_playhead, 'left')) / max_slider_pos);
 			if (was_playing)
 				proxy.play();
+				
+			dispatcher.dispatchEvent(EVT_PLAYHEAD_DRAG_STOP, playbackContext);
 		}
 		
 		was_playing = is_dragging = false;
@@ -142,17 +148,17 @@ var playbackContext = (function(){
 	addEvent(document, 'mousemove touchmove', doDrag);
 	addEvent(document, 'mouseup touchend', stopDrag);
 		
-	dispatcher.addEventListener('play', function() {
+	dispatcher.addEventListener(EVT_PLAY, function() {
 		if (root)
 			addClass(root, 'imob-player-playing');
 	});
 	
-	dispatcher.addEventListener('pause', function() {
+	dispatcher.addEventListener(EVT_PAUSE, function() {
 		if (root)
 			removeClass(root, 'imob-player-playing');
 	});
 	
-	dispatcher.addEventListener('playing seek', function(evt) {
+	dispatcher.addEventListener([EVT_PLAYING, EVT_SEEK], function(evt) {
 		updateUI(evt.data.position, evt.data.duration);
 	});
 	
@@ -184,6 +190,11 @@ var playbackContext = (function(){
 				updateMaxSliderPos();
 				
 				addEvent(ct_shaft, 'mousedown touchstart', startDrag);
+				dispatcher.dispatchEvent(EVT_CHANGE_CONTEXT_ELEMENT, {
+					oldElement: root, 
+					newElement: elem
+				});
+				
 				root = elem;
 			}
 		},

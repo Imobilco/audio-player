@@ -5,6 +5,7 @@
  * 
  * @include "utils.js"
  * @include "playbackContext.js"
+ * @include "events.js"
  */
 
 var playbackProxy = (function(){
@@ -21,7 +22,7 @@ var playbackProxy = (function(){
 	function onPlaybackStart(evt) {
 		clearTimer();
 		play_timer = setInterval(updateContext, 100);
-		context.dispatchEvent('play');
+		context.dispatchEvent(EVT_PLAY);
 	}
 	
 	/**
@@ -50,7 +51,7 @@ var playbackProxy = (function(){
 	 */
 	function seek(pos) {
 		media.currentTime = pos;
-		context.dispatchEvent('seek', {
+		context.dispatchEvent(EVT_SEEK, {
 			position: pos,
 			percent: pos / media.duration,
 			duration: media.duration
@@ -63,7 +64,7 @@ var playbackProxy = (function(){
 	function pause() {
 		media.pause();
 		clearTimer();
-		context.dispatchEvent('pause');
+		context.dispatchEvent(EVT_PAUSE);
 	}
 	
 	function clearTimer() {
@@ -73,7 +74,7 @@ var playbackProxy = (function(){
 	
 	function updateContext() {
 		if (context) {
-			context.dispatchEvent('playing', {
+			context.dispatchEvent(EVT_PLAYING, {
 				position: media.currentTime,
 				duration: media.duration
 			});
@@ -138,7 +139,7 @@ var playbackProxy = (function(){
 			if (this.getSource() != url) {
 				this.pause();
 				media.src = url;
-				context.dispatchEvent('source_change', this.getSource());
+				context.dispatchEvent(EVT_SOURCE_CHANGED, this.getSource());
 			}
 		},
 		
@@ -176,7 +177,7 @@ var playbackProxy = (function(){
 		 */
 		setVolume: function(val) {
 			media.volume = parseFloat(val);
-			context.dispatchEvent('volume', media.volume);
+			context.dispatchEvent(EVT_VOLUME, media.volume);
 		},
 		
 		/**
@@ -217,7 +218,7 @@ var playbackProxy = (function(){
 		 */
 		setLoop: function(val) {
 			media.loop = !!val;
-			context.dispatchEvent('loop', media.volume);
+			context.dispatchEvent(EVT_LOOPING_CHANGED, media.volume);
 		},
 		
 		/**
