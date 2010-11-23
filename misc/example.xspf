@@ -6,7 +6,7 @@
 	
 	<trackList>
 		<track>
-			<location>../test/sample1.mp3</location>
+			<location>../test/audio.mp3</location>
 			<location>file:///mp3s/song_1.ogg</location>
 			<trackNum>1</trackNum>
 			<duration>123123</duration> <!-- milliseconds -->

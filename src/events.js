@@ -61,4 +61,12 @@
 	 * <code>evt.data</code> contains <code>oldElement</code> : <code>HTMLElement</code>
 	 * and <code>newElement</code> : <code>HTMLElement</code>
 	 */
-	EVT_CHANGE_CONTEXT_ELEMENT = 'change_ctx_elem';
+	EVT_CHANGE_CONTEXT_ELEMENT = 'change_ctx_elem',
+	
+	/**
+	 * Constantly dispatches a load progress event.
+	 * <code>evt.data</code> represents a single of loaded or available data
+	 * as <code>start</code> (from 0.0 to 1.0) and <code>end</code> (from 0.0 to 1.0)
+	 * properties 
+	 */
+	EVT_LOAD_PROGRESS = 'progress';

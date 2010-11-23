@@ -19,6 +19,9 @@ var playbackContext = (function(){
 		/** @type {Element} Progress bar control */
 		ct_progress,
 		
+		/** @type {Element} Load progress bar control */
+		ct_load_progress,
+		
 		/** @type {Element} Progress bar shaft */
 		ct_shaft,
 		
@@ -158,6 +161,15 @@ var playbackContext = (function(){
 			removeClass(root, 'imob-player-playing');
 	});
 	
+	// update loaded range
+	dispatcher.addEventListener(EVT_LOAD_PROGRESS, function(evt) {
+		if (ct_load_progress)
+			setCSS(ct_load_progress, {
+				left: (evt.data.start * 100) + '%',
+				width: ((evt.data.end - evt.data.start) * 100) + '%'
+			});
+	});
+	
 	dispatcher.addEventListener([EVT_PLAYING, EVT_SEEK], function(evt) {
 		updateUI(evt.data.position, evt.data.duration);
 	});
@@ -185,6 +197,7 @@ var playbackContext = (function(){
 				
 				ct_playhead = getOneByClass('imob-player-playhead', elem);
 				ct_progress = getOneByClass('imob-player-progress', elem);
+				ct_load_progress = getOneByClass('imob-player-load-progress', elem);
 				ct_shaft = getOneByClass('imob-player-shaft', elem);
 				ct_play_button = getOneByClass('imob-player-play-button', elem);
 				updateMaxSliderPos();

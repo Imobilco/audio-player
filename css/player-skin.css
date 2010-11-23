@@ -24,6 +24,15 @@
 	top:6px;
 	z-index:2;
 	height:1px;
+	/* background:#fff; */
+	display:none;
+}
+
+.imob-player-load-progress {
+	position:absolute;
+	top:6px;
+	z-index:2;
+	height:1px;
 	background:#fff;
 	display:none;
 }
@@ -94,6 +103,7 @@
 }
 
 .imob-player-active .imob-player-playhead,
-.imob-player-active .imob-player-progress {
+.imob-player-active .imob-player-progress,
+.imob-player-active .imob-player-load-progress {
 	display:block;
 }

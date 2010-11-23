@@ -21,7 +21,7 @@ var playbackProxy = (function(){
 	 */
 	function onPlaybackStart(evt) {
 		clearTimer();
-		play_timer = setInterval(updateContext, 100);
+		play_timer = setInterval(updateContext, 15);
 		context.dispatchEvent(EVT_PLAY);
 	}
 	
@@ -43,6 +43,18 @@ var playbackProxy = (function(){
 		}
 			
 		delegateEvent(evt);
+	}
+	
+	/**
+	 * Progress of media loading
+	 * @param {Event} evt
+	 */
+	function onProgress(evt) {
+		var range = media.buffered;
+		context.dispatchEvent(EVT_LOAD_PROGRESS, {
+			start: range.start(0) / media.duration,
+			end: range.end(range.length - 1) / media.duration
+		});
 	}
 	
 	/**
@@ -95,6 +107,8 @@ var playbackProxy = (function(){
 		addEvent(elem, 'play', onPlaybackStart);
 		addEvent(elem, 'pause ended', onPlaybackPause);
 		addEvent(elem, 'ended', onEnded);
+		
+		addEvent(elem, 'progress', onProgress);
 	}
 	
 	return {

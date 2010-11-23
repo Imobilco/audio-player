@@ -101,6 +101,8 @@
 		
 		// add children on page
 		container.appendChild(f);
+		
+		Playlist.all.push(this);
 	};
 	
 	Playlist.prototype = {
@@ -201,5 +203,11 @@
 		getUIContext: function() {
 			return this.proxy.getContext();
 		}
-	}
+	};
+	
+	/**
+	 * List of all instatiated playlists
+	 * @type {Playlist[]}
+	 */
+	Playlist.all = [];
 })();

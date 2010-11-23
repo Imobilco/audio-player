@@ -34,6 +34,7 @@
 		'<div class="imob-player-shaft">' +
 			'<div class="imob-player-playhead"></div>' +
 			'<div class="imob-player-progress"></div>' +
+			'<div class="imob-player-load-progress"></div>' +
 			'<div class="imob-player-shaft-bar"></div>' +
 		'</div>' +
 		'</div>';
