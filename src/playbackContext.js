@@ -6,6 +6,7 @@
  * @link http://chikuyonok.ru
  * @include "EventDispatcher.js"
  * @include "utils.js"
+ * @include "playbackProxy.js"
  */
 var playbackContext = (function(){
 	var dispatcher = new EventDispatcher,
@@ -29,7 +30,10 @@ var playbackContext = (function(){
 		/** Dragging start point */
 		drag_start_pos = {},
 		/** Max slider head position */
-		max_slider_pos = 0;
+		max_slider_pos = 0,
+		
+		/** @type {playbackProxy} Backreference to proxy media element */
+		proxy;
 		
 	function updateUI(position, duration) {
 		if (!root)
@@ -195,5 +199,21 @@ var playbackContext = (function(){
 		 */
 		getRoot: function() {
 			return root;
+		},
+		
+		/**
+		 * Set backreference to media proxy element
+		 * @param {playbackProxy} p
+		 */
+		setProxy: function(p) {
+			proxy = p;
+		},
+		
+		/**
+		 * Returns reference to media proxy element
+		 * @return {playbackProxy}
+		 */
+		getProxy: function() {
+			return proxy;
 		}
 	}})();

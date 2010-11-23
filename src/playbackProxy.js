@@ -119,6 +119,7 @@ var playbackProxy = (function(){
 		 */
 		setContext: function(ctx) {
 			context = ctx;
+			context.setProxy(this);
 		},
 		
 		/**
