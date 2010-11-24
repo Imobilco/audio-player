@@ -536,3 +536,12 @@ var elemDataStorage = (function(){
 		}
 	}
 })();
+
+/**
+ * Returns playlist's ID of the track
+ * @param {Element} elem UI element that represents track
+ * @return {String|null}
+ */
+function getTrackId(elem) {
+	return elem ? elem.getAttribute('data-playitem-id') : null;
+}

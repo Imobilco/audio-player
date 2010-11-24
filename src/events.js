@@ -21,8 +21,14 @@
 	EVT_PLAYING = 'playing',
 	
 	/**
+	 * Dispatched when media source is about to change
+	 * <code>evt.data</code> contains <code>currentSource</code> and <code>newSource</code>
+	 */
+	EVT_SOURCE_BEFORE_CHANGE = 'source_before_change',
+	
+	/**
 	 * Dispatched when media source is changed
-	 * <code>evt.data</code> contains new source
+	 * <code>evt.data</code> contains <code>currentSource</code> and <code>lastSource</code>
 	 */
 	EVT_SOURCE_CHANGED = 'source_changed',
 	

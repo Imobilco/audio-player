@@ -16,7 +16,9 @@
 		active_player_class = 'imob-player-active',
 		default_options = {
 			auto_next: true // TODO implement
-		};
+		},
+		/** @type {Playlist} Pointer to playlist that contains currently playing track*/
+		active_playlist;
 	
 	function bindGlobalEvents() {
 		if (is_global_events_bound)
@@ -43,16 +45,6 @@
 	}
 	
 	/**
-	 * Returns playlist's ID of the track
-	 * @param {Element} elem UI element that represents track
-	 * @return {String|null}
-	 */
-	function getTrackId(elem) {
-		return elem ? elem.getAttribute('data-playitem-id') : null;
-	}
-	
-	
-	/**
 	 * Binds local events on container for speed improvement
 	 * @param {Playlist} ctx
 	 */
@@ -63,6 +55,11 @@
 		
 		addEvent(ctx.continer, 'click', wrapped);
 		eventManager.addEventListener('ended', wrapped);
+	}
+	
+	var _id = 0;
+	function generateId() {
+		return '__playlist' + (_id++);
 	}
 	
 	/**
@@ -77,6 +74,7 @@
 		this.continer = container;
 		/** @type {playbackProxy} */
 		this.proxy = proxy;
+		this.id = generateId();
 		
 		this.options = mergeObjects(default_options, options || {});
 		
@@ -102,7 +100,6 @@
 		// add children on page
 		container.appendChild(f);
 		
-		Playlist.all.push(this);
 		eventManager.dispatchEvent(EVT_PLAYLIST_CREATED, this);
 	};
 	
@@ -190,6 +187,27 @@
 		},
 		
 		/**
+		 * Returns track internal ID
+		 * @param {Number|Element} track Track index or its UI element
+		 * @return {String}
+		 */
+		getTrackId: function(track) {
+			if (typeof item == 'number')
+				return this.list.tracks[track].id;
+			else
+				return getTrackId(track);
+		},
+		
+		/**
+		 * Check if current playlist contains track with specified ID
+		 * @param {String} id
+		 * @return {Boolean}
+		 */
+		hasTrackId: function(id) {
+			return this.getTrackIndex(id) !== -1;
+		},
+		
+		/**
 		 * Returns option value
 		 * @return {Object}
 		 */
@@ -203,12 +221,33 @@
 		 */
 		getUIContext: function() {
 			return this.proxy.getContext();
+		},
+		
+		/**
+		 * Returns UI element bound to media track
+		 * @param {Number|String} track Track index or ID
+		 * @return {Element}
+		 */
+		getTrackUI: function(track) {
+			if (typeof track != 'number')
+				track = this.getTrackIndex(track);
+				
+			return this._tracks_ui[track];
+		},
+		
+		/**
+		 * Returns list of tracks
+		 * @return {IPlaylistItem[]}
+		 */
+		getTracks: function() {
+			return this.list.tracks;
+		},
+		
+		/**
+		 * Returns playlist id
+		 */
+		getId: function() {
+			return this.id;
 		}
 	};
-	
-	/**
-	 * List of all instatiated playlists
-	 * @type {Playlist[]}
-	 */
-	Playlist.all = [];
 })();

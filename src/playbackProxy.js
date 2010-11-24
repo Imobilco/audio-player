@@ -21,8 +21,8 @@ var playbackProxy = (function(){
 	 */
 	function onPlaybackStart(evt) {
 		clearTimer();
+		eventManager.dispatchEvent(EVT_PLAY, {media: this});
 		play_timer = setInterval(updateContext, 15);
-		eventManager.dispatchEvent(EVT_PLAY);
 	}
 	
 	/**
@@ -53,7 +53,8 @@ var playbackProxy = (function(){
 		var range = media.buffered;
 		eventManager.dispatchEvent(EVT_LOAD_PROGRESS, {
 			start: range.start(0) / media.duration,
-			end: range.end(range.length - 1) / media.duration
+			end: range.end(range.length - 1) / media.duration,
+			media: this
 		});
 	}
 	
@@ -66,7 +67,8 @@ var playbackProxy = (function(){
 		eventManager.dispatchEvent(EVT_SEEK, {
 			position: pos,
 			percent: pos / media.duration,
-			duration: media.duration
+			duration: media.duration,
+			media: this
 		});
 	}
 	
@@ -76,7 +78,7 @@ var playbackProxy = (function(){
 	function pause() {
 		media.pause();
 		clearTimer();
-		eventManager.dispatchEvent(EVT_PAUSE);
+		eventManager.dispatchEvent(EVT_PAUSE, {media: this});
 	}
 	
 	function clearTimer() {
@@ -87,12 +89,13 @@ var playbackProxy = (function(){
 	function updateContext() {
 		eventManager.dispatchEvent(EVT_PLAYING, {
 			position: media.currentTime,
-			duration: media.duration
+			duration: media.duration,
+			media: this
 		});
 	}
 	
 	function delegateEvent(evt) {
-		eventManager.dispatchEvent(evt.type);
+		eventManager.dispatchEvent(evt.type, {media: this});
 	}
 		
 	/**
@@ -146,10 +149,23 @@ var playbackProxy = (function(){
 		 * @param {String} url
 		 */
 		setSource: function(url) {
-			if (this.getSource() != url) {
-				this.pause();
+			var last_source = this.getSource();
+			if (last_source != url) {
+				if (last_source)
+					this.pause();
+				
+				eventManager.dispatchEvent(EVT_SOURCE_BEFORE_CHANGE, {
+					currentSource: this.getSource(),
+					newSource: url,
+					media: this
+				});
+				
 				media.src = url;
-				eventManager.dispatchEvent(EVT_SOURCE_CHANGED, this.getSource());
+				eventManager.dispatchEvent(EVT_SOURCE_CHANGED, {
+					currentSource: this.getSource(),
+					lastSource: last_source,
+					media: this
+				});
 			}
 		},
 		
@@ -198,6 +214,22 @@ var playbackProxy = (function(){
 				this.play();
 			else
 				this.pause();
+		},
+		
+		/**
+		 * Returns current playback position (in seconds)
+		 * @return {Number}
+		 */
+		getPosition: function() {
+			return media.currentTime;
+		},
+		
+		/**
+		 * Set new playback position (synonym of <code>seek()</code>)
+		 * @param {Number} val New position (in seconds)
+		 */
+		setPosition: function(val) {
+			this.seek(val);
 		},
 		
 		/**
