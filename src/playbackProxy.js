@@ -14,14 +14,25 @@ var playbackProxy = (function(){
 		/** @type {playbackContext} Player context UI */
 		context,
 		
-		play_timer;
+		play_timer,
+		/** 
+		 * Position (in seconds) where media should start playing after data 
+		 * becomes available. Set <code>null</code> if not start position 
+		 * required
+		 */
+		start_pos = null,
+		
+		/**
+		 * Identifies resource as ready to be played
+		 */
+		resource_ready = false;
 		
 	/**
 	 * @param {Event}
 	 */
 	function onPlaybackStart(evt) {
 		clearTimer();
-		eventManager.dispatchEvent(EVT_PLAY, {media: this});
+		eventManager.dispatchEvent(EVT_PLAY);
 		play_timer = setInterval(updateContext, 15);
 	}
 	
@@ -53,9 +64,21 @@ var playbackProxy = (function(){
 		var range = media.buffered;
 		eventManager.dispatchEvent(EVT_LOAD_PROGRESS, {
 			start: range.start(0) / media.duration,
-			end: range.end(range.length - 1) / media.duration,
-			media: this
+			end: range.end(range.length - 1) / media.duration
 		});
+	}
+	
+	/**
+	 * Handles media data loading
+	 * @param {Event} evt
+	 */
+	function onReadyStateСhange(evt) {
+		resource_ready = true;
+		var media = evt.target;
+		if (start_pos !== null) {
+			seek(start_pos);
+			start_pos = null;
+		}
 	}
 	
 	/**
@@ -63,13 +86,17 @@ var playbackProxy = (function(){
 	 * @param {Number} pos New position (in seconds)
 	 */
 	function seek(pos) {
-		media.currentTime = pos;
-		eventManager.dispatchEvent(EVT_SEEK, {
-			position: pos,
-			percent: pos / media.duration,
-			duration: media.duration,
-			media: this
-		});
+		if (media.readyState == media.HAVE_NOTHING) {
+			// delay seeking before data is loaded
+			start_pos = pos;
+		} else {
+			media.currentTime = pos;
+			eventManager.dispatchEvent(EVT_SEEK, {
+				position: pos,
+				percent: pos / media.duration,
+				duration: media.duration
+			});
+		}
 	}
 	
 	/**
@@ -78,7 +105,7 @@ var playbackProxy = (function(){
 	function pause() {
 		media.pause();
 		clearTimer();
-		eventManager.dispatchEvent(EVT_PAUSE, {media: this});
+		eventManager.dispatchEvent(EVT_PAUSE);
 	}
 	
 	function clearTimer() {
@@ -87,15 +114,15 @@ var playbackProxy = (function(){
 	}
 	
 	function updateContext() {
-		eventManager.dispatchEvent(EVT_PLAYING, {
-			position: media.currentTime,
-			duration: media.duration,
-			media: this
-		});
+		if (resource_ready)
+			eventManager.dispatchEvent(EVT_PLAYING, {
+				position: media.currentTime,
+				duration: media.duration
+			});
 	}
 	
 	function delegateEvent(evt) {
-		eventManager.dispatchEvent(evt.type, {media: this});
+		eventManager.dispatchEvent(evt.type);
 	}
 		
 	/**
@@ -108,6 +135,8 @@ var playbackProxy = (function(){
 		addEvent(elem, 'ended', onEnded);
 		
 		addEvent(elem, 'progress', onProgress);
+		
+		addEvent(elem, 'loadedmetadata', onReadyStateСhange);
 	}
 	
 	return {
@@ -156,15 +185,14 @@ var playbackProxy = (function(){
 				
 				eventManager.dispatchEvent(EVT_SOURCE_BEFORE_CHANGE, {
 					currentSource: this.getSource(),
-					newSource: url,
-					media: this
+					newSource: url
 				});
 				
+				resource_ready = false;
 				media.src = url;
 				eventManager.dispatchEvent(EVT_SOURCE_CHANGED, {
 					currentSource: this.getSource(),
-					lastSource: last_source,
-					media: this
+					lastSource: last_source
 				});
 			}
 		},

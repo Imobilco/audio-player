@@ -545,3 +545,12 @@ var elemDataStorage = (function(){
 function getTrackId(elem) {
 	return elem ? elem.getAttribute('data-playitem-id') : null;
 }
+
+/**
+ * Pad number with zero, if required
+ * @param {Number|String} num
+ * @return {String} 
+ */
+function padNum(num) {
+	return String(num).length == 1 ? '0' + num : '' + num; 
+}

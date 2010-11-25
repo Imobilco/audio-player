@@ -170,7 +170,8 @@ var playbackContext = (function(){
 	});
 	
 	eventManager.addEventListener([EVT_PLAYING, EVT_SEEK], function(evt) {
-		updateUI(evt.data.position, evt.data.duration);
+		if (!isNaN(evt.data.duration))
+			updateUI(evt.data.position, evt.data.duration);
 	});
 	
 	return {

@@ -37,6 +37,15 @@
 	display:none;
 }
 
+.imob-player-last-played-progress {
+	position:absolute;
+	top:6px;
+	right:0;
+	z-index:1;
+	height:1px;
+	background:#2158a6;
+}
+
 .imob-player-playhead {
 	position:absolute;
 	width:14px;

@@ -9,7 +9,7 @@
 			<location>../test/audio.mp3</location>
 			<location>file:///mp3s/song_1.ogg</location>
 			<trackNum>1</trackNum>
-			<duration>123123</duration> <!-- milliseconds -->
+			<duration>219297</duration> <!-- milliseconds -->
 			<album>Этногенез</album>
 			<title>Sample track 1</title>
 		</track>
@@ -17,13 +17,13 @@
 			<location>../test/sample2.mp3</location>
 			<location>file:///mp3s/song_2.ogg</location>
 			<title>Sample track 2</title>
-			<duration>123123</duration>
+			<duration>3239</duration>
 		</track>
 		<track>
 			<location>../test/sample3.mp3</location>
 			<location>file:///mp3s/song_3.ogg</location>
 			<title>Sample track 3</title>
-			<duration>123123</duration>
+			<duration>5015</duration>
 		</track>
 	</trackList>
 </playlist>

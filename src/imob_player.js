@@ -18,6 +18,18 @@
 		 * @type {Playlist} 
 		 */
 		active_playlist;
+		
+	/**
+	 * Search for playlist that contains played track
+	 * @return {Playlist}
+	 */
+	function getPlaylistForTrack(track_id) {
+		for (var i = 0, il = all_playlists.length; i < il; i++) {
+			if (all_playlists[i].hasTrackId(track_id)) {
+				return all_playlists[i];
+			}
+		}
+	}
 	
 	// save all created playlists
 	eventManager.addEventListener(EVT_PLAYLIST_CREATED, function(evt) {
@@ -26,17 +38,8 @@
 	
 	// store active playlist
 	eventManager.addEventListener(EVT_PLAY, function() {
-		var track_ui = playbackProxy.getContext().getRoot(),
-			track_id = getTrackId(track_ui);
-			
-		active_playlist = null;
-		for (var i = 0, il = all_playlists.length; i < il; i++) {
-			if (all_playlists[i].hasTrackId(track_id)) {
-				console.log('store active playlist', all_playlists[i]);
-				active_playlist = all_playlists[i];
-				break;
-			}
-		}
+		var track_ui = playbackProxy.getContext().getRoot();
+		active_playlist = getPlaylistForTrack( getTrackId(track_ui) );
 	});
 	
 	
@@ -77,7 +80,22 @@
 		 */
 		getActivePlaylist: function() {
 			return active_playlist;
-		}
+		},
+		
+		/**
+		 * Returns ID of currently active or played track
+		 * @return {String}
+		 */
+		getActiveTrackId: function() {
+			return getTrackId( playbackProxy.getContext().getRoot() );
+		},
+		
+		/**
+		 * Search for playlist that contains played track
+		 * @param {String} track_id
+		 * @return {Playlist}
+		 */
+		getPlaylistForTrack: getPlaylistForTrack
 	};
 })();
 	
