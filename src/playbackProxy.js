@@ -103,9 +103,11 @@ var playbackProxy = (function(){
 	 * Pause playback
 	 */
 	function pause() {
-		media.pause();
 		clearTimer();
-		eventManager.dispatchEvent(EVT_PAUSE);
+		if (!media.paused) {
+			media.pause();
+			eventManager.dispatchEvent(EVT_PAUSE);
+		}
 	}
 	
 	function clearTimer() {

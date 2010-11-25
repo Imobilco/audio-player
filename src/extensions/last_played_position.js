@@ -107,13 +107,19 @@
 	function store(force) {
 		if (is_dirty || force) {
 			storeDataLocally();
+			if (force)
+				console.log('storing', getActiveTrackId(), createLastPlayedObject());
 			is_dirty = false;
 		}
 	}
 	
-	function startPlaybackListener() {
+	function stopTimer() {
 		if (timer)
 			clearTimeout(timer);
+	}
+	
+	function startPlaybackListener() {
+		stopTimer();
 			
 		// store data each 3 seconds
 		timer = setTimeout(playbackListener, 3000);
@@ -150,6 +156,7 @@
 	
 	// force data store on pause
 	evt_manager.addEventListener(EVT_PAUSE, function() {
+		stopTimer();
 		store(true);
 		is_playing = false;
 	});
