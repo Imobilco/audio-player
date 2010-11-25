@@ -95,7 +95,17 @@
 		 * @param {String} track_id
 		 * @return {Playlist}
 		 */
-		getPlaylistForTrack: getPlaylistForTrack
+		getPlaylistForTrack: getPlaylistForTrack,
+		
+		/**
+		 * Returns playlist item by its ID
+		 * @param {String} id
+		 * @return {IPlaylistItem}
+		 */
+		getTrackById: function(id) {
+			var pl = getPlaylistForTrack(id);
+			return pl ? pl.findTrack(id) : null;
+		}
 	};
 })();
 	

@@ -152,8 +152,6 @@
 				this.proxy.getContext().bindElement(player_elem);
 				this.proxy.setSource(track.location);
 				this.proxy.play();
-			} else {
-				console.log('track not found');
 			}
 		},
 		

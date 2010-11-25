@@ -57,14 +57,6 @@ var playbackContext = (function(){
 			
 		setCSS(ct_playhead, {left: pos_x});
 		setCSS(ct_progress, {width: pos_x});
-		updatePlayProgress(prc);
-	}
-	
-	function updatePlayProgress(prc) {
-		if (max_play_progress < prc)
-			max_play_progress = prc;
-			
-		setCSS(ct_play_button, {backgroundPosition: Math.round(-20 * (1 - max_play_progress)) + 'px 0px'});
 	}
 	
 	function toNum(val) {
@@ -214,8 +206,6 @@ var playbackContext = (function(){
 		 * @param {Number} duration Current media playback position 
 		 */
 		updateUI: updateUI,
-		
-		updatePlayProgress: updatePlayProgress,
 		
 		/**
 		 * @return {Element}

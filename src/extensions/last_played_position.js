@@ -11,7 +11,16 @@
 		 * Play threshold (in percents) when to restore last played data.
 		 * If played length is less than this threshold, data won't be restored 
 		 */
-		threshold = 0.05,
+		min_threshold = 0.05,
+		/**
+		 * Max threshold. Track is recognized as completely played if its play 
+		 * position is greater than max threshold.
+		 */
+		max_threshold = 0.98,
+		/** Max played position */
+		max_play_pos = 0,
+		/** @type {Element} Play button that reflexes max played position */
+		play_btn,
 		timer;
 	
 	/**
@@ -76,15 +85,16 @@
 					last_played_progress = createElement('div', 'imob-player-last-played-progress'),
 					prc = data.pos * 1000 / track.duration;
 					
-				if (prc > threshold) {
+				if (prc > min_threshold && prc < max_threshold) {
 					// adjust play progress
-					setCSS(play_btn, {backgroundPosition: Math.round(-20 * (1 - prc)) + 'px 0px'});
 					setCSS(last_played_progress, {width: ( (1 - prc) * 100 ) + '%'});
-					
-					// format date
-					addText(getOneByClass('imob-player-track-last-play', elem), makeLastPlayedDate(data.time))
 					shaft.appendChild(last_played_progress);
 				}
+				
+				// format date
+				addText(getOneByClass('imob-player-track-last-play', elem), makeLastPlayedDate(data.time))
+				if (data.max)
+					setCSS(play_btn, {backgroundPosition: Math.round(-20 * (1 - data.max * 1000 / track.duration)) + 'px 0px'});
 			}
 		}
 	}
@@ -100,15 +110,14 @@
 	function createLastPlayedObject() {
 		return {
 			time: +new Date,
-			pos: imob_player.getMedia().getPosition()
+			pos: imob_player.getMedia().getPosition(),
+			max: max_play_pos
 		};
 	}
 	
 	function store(force) {
 		if (is_dirty || force) {
 			storeDataLocally();
-			if (force)
-				console.log('storing', getActiveTrackId(), createLastPlayedObject());
 			is_dirty = false;
 		}
 	}
@@ -132,6 +141,20 @@
 		}
 	}
 	
+	function updateMaxPlayPos(pos) {
+		if (pos > max_play_pos) {
+			max_play_pos = pos;
+			
+			var media = imob_player.getMedia();
+			
+			if (!play_btn)
+				play_btn = getOneByClass('imob-player-play-button', 
+					media.getContext().getRoot());
+					
+			setCSS(play_btn, {backgroundPosition: Math.round(-20 * (1 - pos / media.getDuration())) + 'px 0px'});
+		}
+	}
+	
 	/**
 	 * Loads last-played data and updates playlists
 	 */
@@ -150,8 +173,9 @@
 	
 	var evt_manager = imob_player.getEventManager();
 	
-	evt_manager.addEventListener(EVT_PLAYING, function() {
+	evt_manager.addEventListener(EVT_PLAYING, function(evt) {
 		is_dirty = true;
+		updateMaxPlayPos(evt.data.position);
 	});
 	
 	// force data store on pause
@@ -163,6 +187,14 @@
 	
 	evt_manager.addEventListener(EVT_PLAY, function(evt) {
 		is_playing = true;
+		play_btn = null;
+		var track_id = imob_player.getActiveTrackId();
+		
+		max_play_pos = 0;
+		if (track_id && track_id in tracks_last_played) {
+			max_play_pos = tracks_last_played[track_id].max || 0;
+		}
+		
 		startPlaybackListener();
 	});
 	
@@ -177,15 +209,19 @@
 			// we have restored last play data
 			var data = tracks_last_played[track_id];
 			if (!data.was_restored) {
-				media.setPosition(data.pos);
-				// force UI update
-				media.getContext().updateUI(data.pos, playlist.findTrack(track_id).duration / 1000);
+				var track = imob_player.getTrackById(track_id),
+					prc = data.pos * 1000 / track.duration;
+				
+				if (prc > min_threshold && prc < max_threshold) {
+					media.setPosition(data.pos);
+					// force UI update
+					media.getContext().updateUI(data.pos, playlist.findTrack(track_id).duration / 1000);
+				}
+				
 				data.was_restored = true;
 			}
 		}
 	});
-	
-	
 	
 	// LOC start module
 	load();

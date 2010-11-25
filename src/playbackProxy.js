@@ -299,6 +299,14 @@ var playbackProxy = (function(){
 		 */
 		isPlaying: function() {
 			return !media.paused;
+		},
+		
+		/**
+		 * Returns duration (number of seconds) of currently played media
+		 * @return {Number}
+		 */
+		getDuration: function() {
+			return media.duration;
 		}
 		
 	};
