@@ -147,9 +147,15 @@ var playbackContext = (function(){
 			addClass(root, 'imob-player-playing');
 	});
 	
-	eventManager.addEventListener(EVT_PAUSE, function() {
-		if (root)
-			removeClass(root, 'imob-player-playing');
+	eventManager.addEventListener([EVT_PAUSE, EVT_CHANGE_CONTEXT_ELEMENT], function(evt) {
+		var elem = root;
+		if (evt.type == EVT_CHANGE_CONTEXT_ELEMENT) {
+			console.log(evt.type, evt.data.oldElement, evt.data.newElement);
+			elem = evt.data.oldElement;
+		}
+			
+		if (elem)
+			removeClass(elem, 'imob-player-playing');
 	});
 	
 	// update loaded range
@@ -174,6 +180,7 @@ var playbackContext = (function(){
 		 */
 		bindElement: function(elem) {
 			if (root !== elem) {
+				var old_root = root;
 				this.unbindCurrentElement();
 				
 				ct_playhead = getOneByClass('imob-player-playhead', elem);
@@ -185,10 +192,9 @@ var playbackContext = (function(){
 				
 				addEvent(ct_shaft, 'mousedown touchstart', startDrag);
 				eventManager.dispatchEvent(EVT_CHANGE_CONTEXT_ELEMENT, {
-					oldElement: root, 
+					oldElement: old_root, 
 					newElement: elem
 				});
-				
 				root = elem;
 			}
 		},

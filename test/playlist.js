@@ -4,7 +4,7 @@
  * 
  * @include "../src/utils.js"
  */
-var audio = document.getElementById('test');
+var audio = new Audio;
 audio.muted = true;
 audio.volume = 0;
 playbackProxy.init(audio, playbackContext);
