@@ -61,10 +61,21 @@ var playbackProxy = (function(){
 	 * @param {Event} evt
 	 */
 	function onProgress(evt) {
-		var range = media.buffered;
+		var start = 0,
+			end = 0;
+			
+		if ('buffered' in media) {
+			var range = media.buffered;
+			start = range.start(0) / media.duration;
+			end = range.end(range.length - 1) / media.duration;
+		} else if ('loaded' in evt) {
+			start = 0;
+			end = evt.loaded / evt.total
+		}
+		
 		eventManager.dispatchEvent(EVT_LOAD_PROGRESS, {
-			start: range.start(0) / media.duration,
-			end: range.end(range.length - 1) / media.duration
+			start: start,
+			end: end
 		});
 	}
 	
@@ -101,10 +112,13 @@ var playbackProxy = (function(){
 	
 	/**
 	 * Pause playback
+	 * @param {Boolean} force Force pause regardless of media <code>paused</code>
+	 * state. Firefox 3.5+ may run a looped media playback even if <code>paused</code>
+	 * state is <code>true</code> so this flag will force media to stop  
 	 */
-	function pause() {
+	function pause(force) {
 		clearTimer();
-		if (!media.paused) {
+		if (!media.paused || force) {
 			media.pause();
 			eventManager.dispatchEvent(EVT_PAUSE);
 		}
@@ -211,6 +225,8 @@ var playbackProxy = (function(){
 		 * Start playback of current source
 		 */
 		play: function() {
+			if (!resource_ready)
+				media.load();
 			media.play();
 		},
 		

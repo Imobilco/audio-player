@@ -122,6 +122,8 @@
 						var cur_track_ix = this.getTrackIndex(this.proxy.getContext().getRoot());
 						if (cur_track_ix != -1 && cur_track_ix < this.list.tracks.length - 1) {
 							this.switchTrack(this._tracks_ui[cur_track_ix + 1]);
+						} else {
+							this.proxy.pause(true);
 						}
 					}
 					

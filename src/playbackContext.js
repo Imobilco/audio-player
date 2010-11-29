@@ -149,10 +149,8 @@ var playbackContext = (function(){
 	
 	eventManager.addEventListener([EVT_PAUSE, EVT_CHANGE_CONTEXT_ELEMENT], function(evt) {
 		var elem = root;
-		if (evt.type == EVT_CHANGE_CONTEXT_ELEMENT) {
-			console.log(evt.type, evt.data.oldElement, evt.data.newElement);
+		if (evt.type == EVT_CHANGE_CONTEXT_ELEMENT)
 			elem = evt.data.oldElement;
-		}
 			
 		if (elem)
 			removeClass(elem, 'imob-player-playing');
