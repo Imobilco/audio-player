@@ -66,10 +66,12 @@ var playbackProxy = (function(){
 		var start = 0,
 			end = 0;
 			
-		if ('buffered' in media) {
+		if (media.buffered) {
 			var range = media.buffered;
-			start = range.start(0) / media.duration;
-			end = range.end(range.length - 1) / media.duration;
+			if (range.length) {
+				start = range.start(0) / media.duration;
+				end = range.end(range.length - 1) / media.duration;
+			}
 		} else if ('loaded' in evt) {
 			start = 0;
 			end = evt.loaded / evt.total
