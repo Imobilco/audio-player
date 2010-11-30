@@ -25,7 +25,9 @@ var playbackProxy = (function(){
 		/**
 		 * Identifies resource as ready to be played
 		 */
-		resource_ready = false;
+		resource_ready = false,
+		ready_to_play = false,
+		need_to_play = false;
 		
 	/**
 	 * @param {Event}
@@ -85,11 +87,20 @@ var playbackProxy = (function(){
 	 */
 	function onReadyStateСhange(evt) {
 		resource_ready = true;
-		var media = evt.target;
 		if (start_pos !== null) {
 			seek(start_pos);
+			play();
 			start_pos = null;
 		}
+	}
+	
+	/**
+	 * Listenes to network events of media element and controls media 
+	 * playablility
+	 * @param {Event} evt
+	 */
+	function networkListener(evt) {
+//		console.log('got', evt.type);
 	}
 	
 	/**
@@ -124,6 +135,12 @@ var playbackProxy = (function(){
 		}
 	}
 	
+	function play() {
+		if (!resource_ready)
+			media.load();
+		media.play();
+	}
+	
 	function clearTimer() {
 		if (play_timer)
 			clearInterval(play_timer);
@@ -153,6 +170,7 @@ var playbackProxy = (function(){
 		addEvent(elem, 'progress', onProgress);
 		
 		addEvent(elem, 'loadedmetadata', onReadyStateСhange);
+		addEvent(elem, 'emptied loadedmetadata loadeddata canplaythrough loadstart', networkListener);
 	}
 	
 	return {
@@ -206,6 +224,7 @@ var playbackProxy = (function(){
 				
 				resource_ready = false;
 				media.src = url;
+				
 				eventManager.dispatchEvent(EVT_SOURCE_CHANGED, {
 					currentSource: this.getSource(),
 					lastSource: last_source
@@ -224,11 +243,7 @@ var playbackProxy = (function(){
 		/**
 		 * Start playback of current source
 		 */
-		play: function() {
-			if (!resource_ready)
-				media.load();
-			media.play();
-		},
+		play: play,
 		
 		/**
 		 * Pause playback
@@ -275,7 +290,7 @@ var playbackProxy = (function(){
 		 * @param {Number} val New position (in seconds)
 		 */
 		setPosition: function(val) {
-			this.seek(val);
+			seek(val);
 		},
 		
 		/**

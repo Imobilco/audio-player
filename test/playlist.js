@@ -8,7 +8,7 @@ var audio = new Audio;
 //var audio = document.getElementById('test');
 audio.loop = false;
 //audio.muted = true;
-//audio.volume = 0;
+audio.volume = 0.1;
 playbackProxy.init(audio, playbackContext);
 
 function canPlay(type) {
