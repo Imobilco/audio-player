@@ -7,6 +7,7 @@
  * @include "playbackContext.js"
  * @include "eventManager.js"
  * @include "Playlist.js"
+ * @include "imob_player.js"
  */var imob_player = (function(){
 	/**
 	 * List of all instatiated playlists
@@ -38,7 +39,7 @@
 	
 	// store active playlist
 	eventManager.addEventListener(EVT_PLAY, function() {
-		var track_ui = playbackProxy.getContext().getRoot();
+		var track_ui = imob_player.getMedia().getContext().getRoot();
 		active_playlist = getPlaylistForTrack( getTrackId(track_ui) );
 	});
 	
@@ -49,7 +50,7 @@
 		 * @return {playbackProxy}
 		 */
 		getMedia: function() {
-			return playbackProxy;
+			return playbackFlashProxy;
 		},
 		
 		/**
@@ -87,7 +88,7 @@
 		 * @return {String}
 		 */
 		getActiveTrackId: function() {
-			return getTrackId( playbackProxy.getContext().getRoot() );
+			return getTrackId( this.getMedia().getContext().getRoot() );
 		},
 		
 		/**
