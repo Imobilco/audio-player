@@ -136,6 +136,7 @@ class Jplayer {
 			this.mySound.onSoundComplete = function() {
 				self.hasEnded = true;
 			};
+			
 			this.mySound.stop();
 			this.isLoading = true;
 			
@@ -323,7 +324,8 @@ class Jplayer {
 	}
 	
 	function get_duration():Number {
-		return this.mySound.getDuration();
+		var prc = this.mySound.getBytesLoaded() / this.mySound.getBytesTotal();
+		return this.mySound.getDuration() / prc;
 	}
 	
 	function get_position():Number {

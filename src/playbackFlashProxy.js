@@ -145,31 +145,6 @@ var playbackFlashProxy = (function(){
 	}
 	
 	/**
-	 * Progress of media loading
-	 * @param {Event} evt
-	 */
-	function onProgress(evt) {
-		var start = 0,
-			end = 0;
-			
-		if (media.buffered) {
-			var range = media.buffered;
-			if (range.length) {
-				start = range.start(0) / media.duration;
-				end = range.end(range.length - 1) / media.duration;
-			}
-		} else if ('loaded' in evt) {
-			start = 0;
-			end = evt.loaded / evt.total
-		}
-		
-		eventManager.dispatchEvent(EVT_LOAD_PROGRESS, {
-			start: start,
-			end: end
-		});
-	}
-	
-	/**
 	 * Handles media data loading
 	 * @param {Event} evt
 	 */
@@ -212,8 +187,8 @@ var playbackFlashProxy = (function(){
 	 */
 	function pause(force) {
 		clearTimer();
-		if (getMovie().fl_is_playing() || force) {
-			getMovie().fl_pause_mp3();
+		if (media.fl_is_playing() || force) {
+			media.fl_pause_mp3();
 			eventManager.dispatchEvent(EVT_PAUSE);
 		}
 	}
@@ -221,7 +196,7 @@ var playbackFlashProxy = (function(){
 	function play() {
 //		if (!resource_ready)
 //			media.load();
-		getMovie().fl_play_mp3();
+		media.fl_play_mp3();
 	}
 	
 	function clearTimer() {
@@ -346,7 +321,7 @@ var playbackFlashProxy = (function(){
 		 * Toggles playback of current track
 		 */
 		togglePlayback: function() {
-			if (media.paused)
+			if (!this.isPlaying())
 				this.play();
 			else
 				this.pause();
@@ -406,7 +381,8 @@ var playbackFlashProxy = (function(){
 		 * @return {Boolean}
 		 */
 		isPlaying: function() {
-			return getMovie().fl_is_playing();
+			console.log('is playing', media.fl_is_playing());
+			return media.fl_is_playing();
 		},
 		
 		/**
@@ -414,11 +390,10 @@ var playbackFlashProxy = (function(){
 		 * @return {Number}
 		 */
 		getDuration: function() {
-			return getMovie().fl_get_duration();
+			return media.fl_get_duration();
 		},
 		
 		flashCall: function(name) {
-//			console.log(name);
 			if (name in flash_iface) {
 				var args = Array.prototype.splice.call(arguments, 1);
 				flash_iface[name].apply(flash_iface, args);
