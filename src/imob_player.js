@@ -4,6 +4,7 @@
  * @link http://chikuyonok.ru
  * 
  * @include "playbackProxy.js"
+ * @include "playbackFlashProxy.js"
  * @include "playbackContext.js"
  * @include "eventManager.js"
  * @include "Playlist.js"
@@ -18,7 +19,12 @@
 		 * Pointer to playlist that contains currently playing track
 		 * @type {Playlist} 
 		 */
-		active_playlist;
+		active_playlist,
+		options = {
+			swf_url: '../src/lib/jwplayer/player.swf',
+			provider: 'http'
+		},
+		check_order = ['flv', 'mp3', 'ogg'];
 		
 	/**
 	 * Search for playlist that contains played track
@@ -43,6 +49,8 @@
 		active_playlist = getPlaylistForTrack( getTrackId(track_ui) );
 	});
 	
+	var media = playbackProxy.isSupported() ? playbackProxy : playbackFlashProxy;
+	media.init(options, playbackContext);
 	
 	return {
 		/**
@@ -50,7 +58,16 @@
 		 * @return {playbackProxy}
 		 */
 		getMedia: function() {
-			return playbackFlashProxy;
+			return media;
+		},
+		
+		/**
+		 * Force media player to use specified proxy
+		 * @param {playbackProxy} proxy
+		 */
+		setMedia: function(proxy) {
+			media = proxy;
+			media.init(options, playbackContext);
 		},
 		
 		/**
@@ -106,6 +123,21 @@
 		getTrackById: function(id) {
 			var pl = getPlaylistForTrack(id);
 			return pl ? pl.findTrack(id) : null;
+		},
+		
+		/**
+		 * Create playlist item from loaded and parsed playlist data
+		 * @param {Object} files Hash of playlist files, organized by their extension
+		 * @param {Element} container Where to place all UI data
+		 * @return {Playlist}
+		 */
+		createPlaylist: function(files, container) {
+			for (var i = 0, il = check_order.length; i < il; i++) {
+				var ext = check_order[i];
+				if (ext in files && media.canPlayType(ext)) {
+					return new Playlist(files[ext], container, media);
+				}
+			}
 		}
 	};
 })();

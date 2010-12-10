@@ -10,7 +10,7 @@
  */
 var playbackProxy = (function(){
 	/** @type {Element} Media source */
-	var media,
+	var media = null,
 		/** @type {playbackContext} Player context UI */
 		context,
 		
@@ -22,12 +22,22 @@ var playbackProxy = (function(){
 		 */
 		start_pos = null,
 		
+		mime_types = {
+			mp3: 'audio/mpeg',
+			ogg: 'audio/ogg'
+		},
+		
 		/**
 		 * Identifies resource as ready to be played
 		 */
 		resource_ready = false,
 		ready_to_play = false,
 		need_to_play = false;
+		
+	function canPlay(type) {
+		var r = media.canPlayType(type);
+		return r && r != 'no';
+	}
 		
 	/**
 	 * @param {Event}
@@ -168,11 +178,16 @@ var playbackProxy = (function(){
 	return {
 		/**
 		 * Init proxy
-		 * @param {HTMLMediaElement} media
+		 * @param {Object} options
 		 * @param {playbackContext} context
 		 */
-		init: function(elem, ctx) {
-			media = elem;
+		init: function(options, ctx) {
+			if (media === null) {
+				media = new Audio;
+			}
+			
+			// TODO add some options
+			
 			if (!media.hasAttachedEvents) {
 				attachEvents(media);
 				media.hasAttachedEvents = true;
@@ -330,7 +345,32 @@ var playbackProxy = (function(){
 		 */
 		getDuration: function() {
 			return media.duration;
-		}
+		},
 		
+		/**
+		 * Text if current proxy backend is supported by browser
+		 * @return {Boolean}
+		 */
+		isSupported: function() {
+			var audio = document.createElement('audio');
+			return !!audio.canPlayType;
+		},
+		
+		/**
+		 * Returns proxy type ('html5' or 'flash')
+		 * @return {String}
+		 */
+		getType: function() {
+			return 'html5';
+		},
+		
+		/**
+		 * Check if current proxy can play specified media type
+		 * @param {String} type File type ('mp3', 'ogg', etc.)
+		 */
+		canPlayType: function(type) {
+			type = (type || '').toLowerCase();
+			return (type in mime_types) ? canPlay(mime_types[type]) : false;
+		}
 	};
 })();

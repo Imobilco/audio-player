@@ -51,7 +51,7 @@ var playbackFlashProxy = (function(){
 			
 		eventManager.dispatchEvent(EVT_LOAD_PROGRESS, {
 			start: start,
-			end: start + evt.bufferPercent / 100
+			end: Math.min(start + evt.bufferPercent / 100, 1)
 		});
 	}
 	
@@ -134,7 +134,7 @@ var playbackFlashProxy = (function(){
 				container.id = 'imob-jw-player';
 				document.body.appendChild(container);
 				
-				media = jwplayer(container.id).setup({
+				media = jwplayer(container).setup({
 					flashplayer: options.swf_url,
 					width: 1,
 					height: 1,
@@ -305,6 +305,30 @@ var playbackFlashProxy = (function(){
 		 */
 		getDuration: function() {
 			return media.getDuration();
+		},
+		
+		/**
+		 * Text if current proxy backend is supported by browser
+		 * @return {Boolean}
+		 */
+		isSupported: function() {
+			return jwplayer.utils.hasFlash();
+		},
+		
+		/**
+		 * Returns proxy type ('html5' or 'flash')
+		 * @return {String}
+		 */
+		getType: function() {
+			return 'flash';
+		},
+		/**
+		 * Check if current proxy can play specified media type
+		 * @param {String} type File type ('mp3', 'ogg', etc.)
+		 */
+		canPlayType: function(type) {
+			type = type.toLowerCase();
+			return type == 'flv' || type == 'mp3';
 		}
 	};
 })();
