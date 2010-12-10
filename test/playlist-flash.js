@@ -4,9 +4,12 @@
  * 
  * @include "../src/utils.js"
  */
-playbackFlashProxy.init({}, playbackContext);
+playbackFlashProxy.init({
+	swf_url: '../src/lib/jwplayer/player.swf',
+	provider: 'http'
+}, playbackContext);
 
 $.get('../misc/example.xspf', function(data) {
 	var xspf = new XSPF(data);
-	new Playlist(xspf.containers.mp3, getOneByClass('imob-playlist'), playbackFlashProxy);
+	new Playlist(xspf.containers.flv, getOneByClass('imob-playlist'), playbackFlashProxy);
 });

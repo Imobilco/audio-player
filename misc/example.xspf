@@ -8,6 +8,7 @@
 		<track>
 			<location>../test/audio.mp3</location>
 			<location>../test/audio.ogg</location>
+			<location>/test/audio.flv</location>
 			<trackNum>1</trackNum>
 			<duration>219297</duration> <!-- milliseconds -->
 			<album>Этногенез</album>
@@ -16,12 +17,14 @@
 		<track>
 			<location>../test/sample2.mp3</location>
 			<location>../test/sample2.ogg</location>
+			<location>/test/sample2.flv</location>
 			<title>Sample track 2</title>
 			<duration>3239</duration>
 		</track>
 		<track>
 			<location>../test/sample3.mp3</location>
 			<location>../test/sample3.ogg</location>
+			<location>/test/sample3.flv</location>
 			<title>Sample track 3</title>
 			<duration>5015</duration>
 		</track>

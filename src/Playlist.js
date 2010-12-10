@@ -151,7 +151,7 @@
 				//activate current track
 				addClass(player_elem, active_player_class);
 				this.proxy.getContext().bindElement(player_elem);
-				this.proxy.setSource(track.location);
+				this.proxy.setSource(track);
 				this.proxy.play();
 			}
 		},
