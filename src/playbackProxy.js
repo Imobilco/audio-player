@@ -6,8 +6,8 @@
  * @include "utils.js"
  * @include "playbackContext.js"
  * @include "eventManager.js"
+ * @include "interfaces/IPlaylist.js"
  */
-
 var playbackProxy = (function(){
 	/** @type {Element} Media source */
 	var media,
@@ -97,15 +97,6 @@ var playbackProxy = (function(){
 	}
 	
 	/**
-	 * Listenes to network events of media element and controls media 
-	 * playablility
-	 * @param {Event} evt
-	 */
-	function networkListener(evt) {
-//		console.log('got', evt.type);
-	}
-	
-	/**
 	 * Seek current track at specified position
 	 * @param {Number} pos New position (in seconds)
 	 */
@@ -172,7 +163,6 @@ var playbackProxy = (function(){
 		addEvent(elem, 'progress', onProgress);
 		
 		addEvent(elem, 'loadedmetadata', onReadyStateСhange);
-		addEvent(elem, 'emptied loadedmetadata loadeddata canplaythrough loadstart', networkListener);
 	}
 	
 	return {
@@ -211,21 +201,21 @@ var playbackProxy = (function(){
 		
 		/**
 		 * Set current playback media source
-		 * @param {String} url
+		 * @param {IPlaylistItem} track
 		 */
-		setSource: function(url) {
+		setSource: function(track) {
 			var last_source = this.getSource();
-			if (last_source != url) {
+			if (last_source != track.location) {
 				if (last_source)
 					this.pause();
 				
 				eventManager.dispatchEvent(EVT_SOURCE_BEFORE_CHANGE, {
 					currentSource: this.getSource(),
-					newSource: url
+					newSource: track.location
 				});
 				
 				resource_ready = false;
-				media.src = url;
+				media.src = track.location;
 				
 				eventManager.dispatchEvent(EVT_SOURCE_CHANGED, {
 					currentSource: this.getSource(),

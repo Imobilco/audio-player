@@ -11,7 +11,6 @@
  * @include "interfaces/IPlaylist.js"
  * @include "./lib/jwplayer/jwplayer.js"
  */
-
 var playbackFlashProxy = (function(){
 	/** @type {jwplayer} Media source */
 	var media = null,
