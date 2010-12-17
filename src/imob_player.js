@@ -20,10 +20,11 @@
 		 * @type {Playlist} 
 		 */
 		active_playlist,
-		options = {
+		default_options = {
 			swf_url: '../src/lib/jwplayer/player.swf',
 			provider: 'http'
 		},
+		options = {},
 		check_order = ['flv', 'mp3', 'ogg'];
 		
 	/**
@@ -131,7 +132,9 @@
 		 * @param {Element} container Where to place all UI data
 		 * @return {Playlist}
 		 */
-		createPlaylist: function(files, container) {
+		createPlaylist: function(files, container, opt) {
+			options = mergeObjects(default_options, opt || {});
+			
 			for (var i = 0, il = check_order.length; i < il; i++) {
 				var ext = check_order[i];
 				if (ext in files && media.canPlayType(ext)) {
