@@ -66,8 +66,9 @@
 		 * Force media player to use specified proxy
 		 * @param {playbackProxy} proxy
 		 */
-		setMedia: function(proxy) {
+		setMedia: function(proxy, opt) {
 			media = proxy;
+			options = mergeObjects(default_options, opt || {});
 			media.init(options, playbackContext);
 		},
 		
