@@ -205,7 +205,7 @@ var playbackFlashProxy = (function(){
 		 * @return {String}
 		 */
 		getSource: function() {
-			var item = media.getPlaylistItem(); 
+			var item = media.getPlaylistItem();
 			return item ? item.file : null;
 		},
 		

@@ -24,6 +24,7 @@
 			swf_url: '../src/lib/jwplayer/player.swf',
 			provider: 'http'
 		},
+		media,
 		options = {},
 		check_order = ['flv', 'mp3', 'ogg'];
 		
@@ -50,8 +51,10 @@
 		active_playlist = getPlaylistForTrack( getTrackId(track_ui) );
 	});
 	
-	var media = playbackProxy.isSupported() ? playbackProxy : playbackFlashProxy;
-	media.init(options, playbackContext);
+	function initMedia() {
+		media = playbackProxy.isSupported() ? playbackProxy : playbackFlashProxy;
+		media.init(options, playbackContext);
+	}
 	
 	return {
 		/**
@@ -135,6 +138,9 @@
 		 */
 		createPlaylist: function(files, container, opt) {
 			options = mergeObjects(default_options, opt || {});
+			
+			if (!media)
+				initMedia();
 			
 			for (var i = 0, il = check_order.length; i < il; i++) {
 				var ext = check_order[i];

@@ -7,6 +7,7 @@
 	var tracks_last_played = {},
 		is_dirty = false,
 		is_playing = false,
+		has_storage = window.localStorage && window.JSON,
 		/** 
 		 * Play threshold (in percents) when to restore last played data.
 		 * If played length is less than this threshold, data won't be restored 
@@ -40,6 +41,9 @@
 	 * track ID and <code>value</code> is last played data
 	 */
 	function loadDataLocally(callback) {
+		if (!has_storage)
+			return {};
+			
 		var storage = window.localStorage,
 			key, data,
 			re_key = /^track__/,
@@ -100,6 +104,8 @@
 	}
 	
 	function storeDataLocally() {
+		if (!has_storage) return;
+		
 		var storage = window.localStorage,
 			track_id = getActiveTrackId(),
 			data = JSON.stringify(createLastPlayedObject());
