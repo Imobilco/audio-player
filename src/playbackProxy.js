@@ -97,7 +97,7 @@ var playbackProxy = (function(){
 	 * Handles media data loading
 	 * @param {Event} evt
 	 */
-	function onReadyStateСhange(evt) {
+	function onReadyStateChange(evt) {
 		resource_ready = true;
 		if (start_pos !== null) {
 			seek(start_pos);
@@ -172,7 +172,7 @@ var playbackProxy = (function(){
 		
 		addEvent(elem, 'progress', onProgress);
 		
-		addEvent(elem, 'loadedmetadata', onReadyStateСhange);
+		addEvent(elem, 'loadedmetadata', onReadyStateChange);
 	}
 	
 	return {
