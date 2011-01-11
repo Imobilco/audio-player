@@ -113,4 +113,4 @@ EventDispatcher.prototype = {
 			
 		return true;
 	}
-}
+};
