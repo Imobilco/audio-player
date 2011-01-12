@@ -45,7 +45,7 @@ EventDispatcher.prototype = {
 			return !!list;
 		else {
 			for (var i = 0, il = list.length; i < il; i++) {
-				if (list[i].fn === listener)
+				if (list[i] && list[i].fn === listener)
 					return true;
 			}
 			
@@ -68,7 +68,7 @@ EventDispatcher.prototype = {
 		else {
 			var list = this.listenerChain[type];
 			for (var i = 0, il = list.length; i < il; i++) {
-				if(list[i].fn === listener)
+				if(list[i] && list[i].fn === listener)
 					list.splice(i, 1);
 			}
 		}
