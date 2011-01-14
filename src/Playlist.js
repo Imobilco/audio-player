@@ -10,7 +10,7 @@
  * @include "eventManager.js"
  */
 
-(function(){
+var Playlist = (function(){
 	var is_global_events_bound = false,
 		player_root_class = 'imob-player',
 		active_player_class = 'imob-player-active',
@@ -69,7 +69,7 @@
 	 * @param {Element} container Element where to store player controls
 	 * @param {playbackProxy} proxy Media proxy element
 	 */
-	var Playlist = this.Playlist = function(list, container, proxy, options) {
+	var P = function(list, container, proxy, options) {
 		this.list = list;
 		this.continer = container;
 		/** @type {playbackProxy} */
@@ -79,7 +79,22 @@
 		this.options = mergeObjects(default_options, options || {});
 		
 		/** @type {Element[]} */
-		this._tracks_ui = [];
+		this._tracks_ui = P.createUI(list, container);
+		
+		bindGlobalEvents();
+		bindLocalEvents(this);
+		
+		eventManager.dispatchEvent(EVT_PLAYLIST_CREATED, this);
+	};
+	
+	/**
+	 * Creates UI for passed list of tracks
+	 * @param {IPlaylist} list List of available tracks
+	 * @param {Element} container Element where to store player controls
+	 * @return {Element[]} Array of UI components for each track
+	 */
+	P.createUI = function(list, container) {
+		var result = [];
 		
 		// create player controls
 		var track, item, f = document.createDocumentFragment();
@@ -90,20 +105,16 @@
 			item = playerUIFactory(track);
 			item.setAttribute('data-playitem-id', track.id);
 			f.appendChild(item);
-			this._tracks_ui.push(item);
+			result.push(item);
 		}
-		
-		bindGlobalEvents();
-		bindLocalEvents(this);
-		
 		
 		// add children on page
 		container.appendChild(f);
 		
-		eventManager.dispatchEvent(EVT_PLAYLIST_CREATED, this);
+		return result;
 	};
 	
-	Playlist.prototype = {
+	P.prototype = {
 		/**
 		 * Dispatches incoming event
 		 * @param {Event} evt
@@ -113,7 +124,10 @@
 				case 'click':
 					if (bubbleSearch(evt.target, 'imob-player-play-button')) {
 						this.switchTrack(bubbleSearch(evt.target, player_root_class));
+						
+						evt.preventDefault();
 						evt.stopPropagation();
+						return false;
 					}
 					
 					break;
@@ -249,4 +263,6 @@
 			return this.id;
 		}
 	};
+	
+	return P;
 })();

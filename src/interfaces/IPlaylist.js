@@ -9,14 +9,15 @@
 
 IPlaylist.prototype = {
 	/**
-	 * List of playlist items defined as hashes where file extension is a key,
-	 * e.g. <code>tracks[0]['mp3'] = new IPlaylistItem()</code>
-	 * @type {IPlaylistItem[]}
+	 * List of playlist tracks organized by extension
 	 */
-	tracks: [],
-	
-	/** Media type (mp3, ogg, etc.) */
-	type: 'mp3'
+	containers: {
+		'mp3': {
+			/** @type {IPlaylistItem[]} */
+			tracks: [],
+			type: 'mp3'
+		}
+	}
 };
 
 /**

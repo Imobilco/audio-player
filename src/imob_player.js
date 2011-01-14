@@ -57,6 +57,8 @@
 	}
 	
 	return {
+		
+		
 		/**
 		 * Returns proxy object used for media playback
 		 * @return {playbackProxy}
@@ -131,16 +133,24 @@
 		},
 		
 		/**
+		 * Setup player for initial use
+		 * @param {Object} opt Player options
+		 */
+		setup: function(opt) {
+			options = mergeObjects(default_options, opt || {});
+			
+			if (!media)
+				initMedia();
+		},
+		
+		/**
 		 * Create playlist item from loaded and parsed playlist data
 		 * @param {Object} files Hash of playlist files, organized by their extension
 		 * @param {Element} container Where to place all UI data
 		 * @return {Playlist}
 		 */
 		createPlaylist: function(files, container, opt) {
-			options = mergeObjects(default_options, opt || {});
-			
-			if (!media)
-				initMedia();
+			this.setup(opt)
 			
 			for (var i = 0, il = check_order.length; i < il; i++) {
 				var ext = check_order[i];
