@@ -48,6 +48,7 @@ var playbackFlashProxy = (function(){
 	 */
 	function onProgress(evt) {
 		var start = last_seek_pos / evt.duration;
+//		var start = 0;
 			
 		eventManager.dispatchEvent(EVT_LOAD_PROGRESS, {
 			start: start,
@@ -102,13 +103,13 @@ var playbackFlashProxy = (function(){
 	 */
 	function pause(force) {
 		if (isPlaying() || force) {
-			media.pause(true);
+			media.pause();
 			eventManager.dispatchEvent(EVT_PAUSE);
 		}
 	}
 	
 	function play() {
-		media.play(true);
+		media.play();
 	}
 	
 	function updateContext(evt) {
@@ -133,7 +134,6 @@ var playbackFlashProxy = (function(){
 				var container = createElement('div');
 				container.id = 'imob-jw-player';
 				document.body.appendChild(container);
-				
 				media = jwplayer(container).setup({
 					flashplayer: options.swf_url,
 					width: 1,

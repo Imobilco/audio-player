@@ -9,7 +9,10 @@ $.get('../misc/example.xspf', function(data) {
 	var xspf = new XSPF(data);
 	
 	// force Flash usage
-//	imob_player.setMedia(playbackFlashProxy);
+	imob_player.setMedia(playbackFlashProxy, {
+		swf_url: '/audio-player/src/lib/jwplayer/player.swf',
+		provider: 'http'
+	});
 	
 	var playlist = imob_player.createPlaylist(xspf.containers, getOneByClass('imob-playlist'));
 	if (!playlist) {
