@@ -58,7 +58,6 @@
 	
 	return {
 		
-		
 		/**
 		 * Returns proxy object used for media playback
 		 * @return {playbackProxy}
@@ -75,6 +74,17 @@
 			media = proxy;
 			options = mergeObjects(default_options, opt || {});
 			media.init(options, playbackContext);
+		},
+		
+		/**
+		 * Return specified media proxy object
+		 * @param {String} name Proxy name ('html5' or 'flash')
+		 */
+		getProxy: function(name) {
+			if ((name || '').toLowerCase() == 'html5')
+				return playbackProxy;
+			else
+				return playbackFlashProxy;
 		},
 		
 		/**
@@ -150,7 +160,7 @@
 		 * @return {Playlist}
 		 */
 		createPlaylist: function(files, container, opt) {
-			this.setup(opt)
+			this.setup(opt);
 			
 			for (var i = 0, il = check_order.length; i < il; i++) {
 				var ext = check_order[i];

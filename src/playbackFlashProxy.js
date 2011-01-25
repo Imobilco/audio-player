@@ -20,6 +20,7 @@ var playbackFlashProxy = (function(){
 		is_loop = false,
 		last_seek_pos = 0,
 		_options = {},
+		skip_tick = false,
 		
 		/** 
 		 * Position (in seconds) where media should start playing after data 
@@ -75,8 +76,10 @@ var playbackFlashProxy = (function(){
 	 * Seek current track at specified position
 	 * @param {Number} pos New position (in seconds)
 	 */
-	function seek(pos) {
+	function seek(pos, no_skip) {
 		last_seek_pos = pos;
+//		media.pause();
+		skip_tick = !no_skip;
 		media.seek(pos);
 		var duration = media.getDuration();
 		eventManager.dispatchEvent(EVT_SEEK, {
@@ -84,6 +87,7 @@ var playbackFlashProxy = (function(){
 			percent: pos / duration,
 			duration: duration
 		});
+		media.play();
 	}
 	
 	/**
@@ -113,10 +117,13 @@ var playbackFlashProxy = (function(){
 	}
 	
 	function updateContext(evt) {
-		eventManager.dispatchEvent(EVT_PLAYING, {
-			position: evt.position,
-			duration: evt.duration
-		});
+		if (skip_tick)
+			skip_tick = false;
+		else
+			eventManager.dispatchEvent(EVT_PLAYING, {
+				position: evt.position,
+				duration: evt.duration
+			});
 	}
 	
 	function delegateEvent(evt) {
@@ -259,7 +266,7 @@ var playbackFlashProxy = (function(){
 		 * @param {Number} val New position (in seconds)
 		 */
 		setPosition: function(val) {
-			seek(val);
+			seek(val, true);
 		},
 		
 		/**
