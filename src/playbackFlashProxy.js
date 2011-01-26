@@ -119,7 +119,7 @@ var playbackFlashProxy = (function(){
 	}
 	
 	function updateContext(evt) {
-		if (has_meta)
+		if (has_meta && isPlaying())
 			eventManager.dispatchEvent(EVT_PLAYING, {
 				position: evt.position,
 				duration: evt.duration

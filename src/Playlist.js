@@ -69,7 +69,7 @@ var Playlist = (function(){
 	 * @param {Element} container Element where to store player controls
 	 * @param {playbackProxy} proxy Media proxy element
 	 */
-	var P = function(list, container, proxy, options) {
+	var _Playlist = function(list, container, proxy, options) {
 		this.list = list;
 		this.continer = container;
 		/** @type {playbackProxy} */
@@ -79,7 +79,7 @@ var Playlist = (function(){
 		this.options = mergeObjects(default_options, options || {});
 		
 		/** @type {Element[]} */
-		this._tracks_ui = P.createUI(list, container);
+		this._tracks_ui = _Playlist.createUI(list, container);
 		
 		bindGlobalEvents();
 		bindLocalEvents(this);
@@ -93,7 +93,7 @@ var Playlist = (function(){
 	 * @param {Element} container Element where to store player controls
 	 * @return {Element[]} Array of UI components for each track
 	 */
-	P.createUI = function(list, container) {
+	_Playlist.createUI = function(list, container) {
 		var result = [];
 		
 		// create player controls
@@ -114,7 +114,7 @@ var Playlist = (function(){
 		return result;
 	};
 	
-	P.prototype = {
+	_Playlist.prototype = {
 		/**
 		 * Dispatches incoming event
 		 * @param {Event} evt
@@ -264,5 +264,5 @@ var Playlist = (function(){
 		}
 	};
 	
-	return P;
+	return _Playlist;
 })();
