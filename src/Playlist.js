@@ -18,7 +18,10 @@ var Playlist = (function(){
 			auto_next: true // TODO implement
 		},
 		/** @type {Playlist} Pointer to playlist that contains currently playing track*/
-		active_playlist;
+		active_playlist,
+		
+		/** @type {Element} Previously played track */
+		prev_track;
 	
 	function bindGlobalEvents() {
 		if (is_global_events_bound)
@@ -158,12 +161,13 @@ var Playlist = (function(){
 			var track = this.findTrack(player_elem);
 			if (track) {
 				// disable previuos track
-				for (var j = 0, jl = this._tracks_ui.length; j < jl; j++) {
-					removeClass(this._tracks_ui[j], active_player_class);
-				}
+				if (prev_track)
+					removeClass(prev_track, active_player_class);
 				
 				//activate current track
 				addClass(player_elem, active_player_class);
+				prev_track = player_elem;
+				
 				this.proxy.getContext().bindElement(player_elem);
 				this.proxy.setSource(track);
 				this.proxy.play();
