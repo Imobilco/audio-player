@@ -68,7 +68,7 @@
 	 */
 	function makeLastPlayedDate(milliseconds) {
 		var dt = new Date(milliseconds);
-		return padNum(dt.getDate()) + '.' + padNum(dt.getMonth()) + '.' + padNum(dt.getFullYear());
+		return padNum(dt.getDate()) + '.' + padNum(dt.getMonth() + 1) + '.' + padNum(dt.getFullYear());
 	}
 	
 	/**
@@ -149,7 +149,7 @@
 	
 	function updateMaxPlayPos(pos) {
 		if (pos > max_play_pos) {
-			max_play_pos = pos;
+			max_play_pos = Math.min(pos, media.getDuration());
 			
 			var media = imob_player.getMedia();
 			
@@ -157,7 +157,7 @@
 				play_btn = getOneByClass('imob-player-play-button', 
 					media.getContext().getRoot());
 					
-			setCSS(play_btn, {backgroundPosition: Math.round(-20 * (1 - pos / media.getDuration())) + 'px 0px'});
+			setCSS(play_btn, {backgroundPosition: Math.round(-20 * (1 - max_play_pos / media.getDuration())) + 'px 0px'});
 		}
 	}
 	
@@ -214,18 +214,18 @@
 		if (track_id && track_id in tracks_last_played) {
 			// we have restored last play data
 			var data = tracks_last_played[track_id];
-			if (!data.was_restored) {
-				var track = imob_player.getTrackById(track_id),
-					prc = data.pos * 1000 / track.duration;
-				
-				if (prc > min_threshold && prc < max_threshold) {
-					media.setPosition(data.pos);
-					// force UI update
-					media.getContext().updateUI(data.pos, playlist.findTrack(track_id).duration / 1000);
-				}
-				
-				data.was_restored = true;
+			var track = imob_player.getTrackById(track_id),
+				prc = data.pos * 1000 / track.duration;
+			
+			if (prc > min_threshold && prc < max_threshold) {
+				media.setPosition(data.pos);
+				// force UI update
+				media.getContext().updateUI(data.pos, playlist.findTrack(track_id).duration / 1000);
 			}
+			
+			data.was_restored = true;
+//			if (!data.was_restored) {
+//			}
 		}
 	});
 	

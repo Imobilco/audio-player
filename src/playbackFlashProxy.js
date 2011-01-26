@@ -21,6 +21,7 @@ var playbackFlashProxy = (function(){
 		last_seek_pos = 0,
 		_options = {},
 		skip_tick = false,
+		has_meta = false,
 		
 		/** 
 		 * Position (in seconds) where media should start playing after data 
@@ -78,8 +79,8 @@ var playbackFlashProxy = (function(){
 	 */
 	function seek(pos, no_skip) {
 		last_seek_pos = pos;
-//		media.pause();
 		skip_tick = !no_skip;
+		
 		media.seek(pos);
 		var duration = media.getDuration();
 		eventManager.dispatchEvent(EVT_SEEK, {
@@ -87,7 +88,8 @@ var playbackFlashProxy = (function(){
 			percent: pos / duration,
 			duration: duration
 		});
-		media.play();
+		
+		play();
 	}
 	
 	/**
@@ -107,19 +109,17 @@ var playbackFlashProxy = (function(){
 	 */
 	function pause(force) {
 		if (isPlaying() || force) {
-			media.pause();
+			media.pause(true);
 			eventManager.dispatchEvent(EVT_PAUSE);
 		}
 	}
 	
 	function play() {
-		media.play();
+		media.play(true);
 	}
 	
 	function updateContext(evt) {
-		if (skip_tick)
-			skip_tick = false;
-		else
+		if (has_meta)
 			eventManager.dispatchEvent(EVT_PLAYING, {
 				position: evt.position,
 				duration: evt.duration
@@ -150,7 +150,19 @@ var playbackFlashProxy = (function(){
 						onPause: onPlaybackPause,
 						onComplete: onEnded,
 						onTime: updateContext,
-						onBufferChange: onProgress
+						onBufferChange: onProgress,
+						onError: function(msg) {
+							if (window.console)
+								console.error('jw error: ', msg);
+						},
+						onMeta: function(meta) {
+							if (!has_meta && last_seek_pos) {
+								has_meta = true;
+								seek(last_seek_pos);
+							}
+							
+							has_meta = true;
+						}
 					}
 				});
 				
@@ -194,6 +206,7 @@ var playbackFlashProxy = (function(){
 					newSource: track.location
 				});
 				
+				has_meta = false;
 				last_seek_pos = 0;
 				media.load(mergeObjects(_options, {
 					duration: track.duration / 1000,
