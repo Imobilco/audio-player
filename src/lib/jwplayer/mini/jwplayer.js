@@ -833,7 +833,7 @@ jwplayer.version = '5.4.1530';/**
 			}
 		} else {
 			if (selector.indexOf(".") > 0) {
-				selectors = selector.split(".");
+				var selectors = selector.split(".");
 				return jwplayer.utils.selectors.getElementsByTagAndClass(selectors[0], selectors[1]);
 			} else {
 				return parent.getElementsByTagName(selector);
@@ -843,7 +843,7 @@ jwplayer.version = '5.4.1530';/**
 	};
 	
 	jwplayer.utils.selectors.getElementsByTagAndClass = function(tagName, className, parent) {
-		elements = [];
+		var elements = [];
 		if (parent === undefined) {
 			parent = document;
 		}
@@ -1284,7 +1284,7 @@ jwplayer.version = '5.4.1530';/**
 			return this.callInternal('jwGetMute');
 		},
 		getPlaylist: function() {
-			var playlist = this.callInternal('jwGetPlaylist');
+			var playlist = this.callInternal('jwGetPlaylist') || [];
 			for (var i = 0; i < playlist.length; i++) {
 				if (playlist[i].index === undefined) {
 					playlist[i].index = i;
@@ -1860,7 +1860,7 @@ playerReady = function(obj) {
 			position: "bottom-left"
 		};
 		
-		_css = jwplayer.utils.css;
+		var _css = jwplayer.utils.css;
 		
 		var _logo;
 		var _settings;
