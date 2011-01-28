@@ -55,8 +55,8 @@ var playbackContext = (function(){
 	function movePlayhead(prc) {
 		var pos_x = Math.round(max_slider_pos * prc);
 			
-		setCSS(ct_playhead, {left: pos_x});
-		setCSS(ct_progress, {width: pos_x});
+		setCSS(ct_playhead, {left: Math.round(pos_x)});
+		setCSS(ct_progress, {width: Math.round(pos_x)});
 	}
 	
 	function toNum(val) {

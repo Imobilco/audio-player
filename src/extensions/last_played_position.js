@@ -181,7 +181,9 @@
 	
 	evt_manager.addEventListener(EVT_PLAYING, function(evt) {
 		is_dirty = true;
-		updateMaxPlayPos(evt.data.position);
+		try {
+			updateMaxPlayPos(evt.data.position);
+		} catch(e) {}
 	});
 	
 	// force data store on pause
